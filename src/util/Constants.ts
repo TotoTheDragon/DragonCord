@@ -30,7 +30,7 @@ export const REST_VERSION = 8;
 export enum Urls {
     Base = "/api/v",
     CDN = "https://cdn.discordapp.com",
-    Client = "https://discord.com"
+    Client = "discord.com"
 }
 
 export enum Endpoints {
