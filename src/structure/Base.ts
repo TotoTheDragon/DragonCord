@@ -23,7 +23,7 @@ export class Base {
     }
 
     /*
-        Update data after new fetch
+        Update data
     */
     _update(data) {
         const clone = this._clone(); // Make a clone of this object
