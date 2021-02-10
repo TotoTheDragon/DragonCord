@@ -36,7 +36,7 @@ export class WebsocketManager extends EventEmitter {
                     if (request.op === 0) {
                         if (handlers[request.t]) {
                             handlers[request.t](this.client, request, this.client.options.shard);
-                        } else console.log(`SHARD #${this.client.options.shard}: ${request.t}`);
+                        } else console.log(`SHARD #${this.client.options.shard}:`, request);
                         return;
                     }
                     else if (request.op === 10) {
@@ -70,7 +70,7 @@ export class WebsocketManager extends EventEmitter {
         }, this.heartbeatInterval);
     }
 
-    async sendIdentify(token: string, intent: number = 13949) {
+    async sendIdentify(token: string, intent: number = 13951) {
         this.ws.send(
             JSON.stringify(
                 {
