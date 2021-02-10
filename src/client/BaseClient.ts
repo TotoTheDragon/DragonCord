@@ -72,14 +72,15 @@ export class BaseClient extends EventEmitter {
 }
 
 export interface ClientOptions {
-    shard?: number;
-    shardCount?: number;
-    messageCacheMaxSize?: number;
-    messageCacheLifetime?: number;
-    messageSweepInterval?: number;
-    restWsBridgeTimeout?: number;
-    restTimeOffset?: number;
-    restRequestTimeout?: number;
-    restSweepInterval?: number;
-    retryLimit?: number;
+    shard?: number,
+    shardCount?: number,
+    messageCacheMaxSize?: number,
+    messageCacheLifetime?: number,
+    messageSweepInterval?: number,
+    restWsBridgeTimeout?: number,
+    restTimeOffset?: number,
+    restRequestTimeout?: number,
+    restSweepInterval?: number,
+    retryLimit?: number,
+    guildCache?: boolean
 }

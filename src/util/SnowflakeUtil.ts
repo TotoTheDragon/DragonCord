@@ -1,3 +1,4 @@
+import { Snowflake } from "./Constants";
 
 const EPOCH = 1420070400000;
 let INCREMENT = 0;
@@ -77,6 +78,10 @@ export class SnowflakeUtil {
         }
 
         return dec;
+    }
+
+    static findShard(id: Snowflake, shardCount: number): number {
+        return (parseInt(id) >> 22) % shardCount;
     }
 
     static get EPOCH() {
