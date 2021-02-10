@@ -47,7 +47,6 @@ export class Base {
         for (const prop of props) {
             const value = this[prop];
             const type = typeof value;
-            console.log(type, value)
             if (value === undefined) continue;
             if (type !== "object" && type !== "function" || value === null) json[prop] = value;
             else if (value.serialize !== undefined) json[prop] = value.serialize(); // Other instance of Base
