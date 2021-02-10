@@ -75,6 +75,22 @@ export class Guild extends Base {
         return new Date(this.joinedTimestamp);
     }
 
+    iconURL(): string {
+        return ""
+    }
+
+    splashURL(): string {
+        return ""
+    }
+
+    discoverySplashURL(): string {
+        return "";
+    }
+
+    bannerURL(): string {
+        return "";
+    }
+
 
     _deserialize(data: any) {
 
@@ -121,4 +137,17 @@ export class Guild extends Base {
             this.ownerID = data.owner_id;
     }
 
+    serialize(props: string[] = []): object {
+        return super.serialize([
+            "name",
+            "description",
+            "available",
+            "iconURL",
+            "splashURL",
+            "discoverySplashURL",
+            "bannerURL",
+            ...props
+        ]
+        )
+    }
 }
