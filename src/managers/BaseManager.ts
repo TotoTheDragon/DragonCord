@@ -41,8 +41,8 @@ export class BaseManager<K, T extends Base> {
         this._cache.clear();
     }
 
-    resolve(idOrInstance: K | T) {
-        if (idOrInstance instanceof this._holds) return idOrInstance;
+    resolve(idOrInstance: K | T): T {
+        if (idOrInstance instanceof this._holds) return idOrInstance as T;
         if (typeof idOrInstance === 'string') return this._cache.get(idOrInstance) || null;
         return null;
     }
