@@ -47,10 +47,12 @@ export class Base {
         for (const prop of props) {
             const value = this[prop];
             const type = typeof value;
+            console.log(type, value)
             if (value === undefined) continue;
             if (type !== "object" && type !== "function" || value === null) json[prop] = value;
             else if (value.serialize !== undefined) json[prop] = value.serialize(); // Other instance of Base
             else if (value.values !== undefined) json[prop] = [...value.values()]; // Maps and similar objects
+            else if (type === "function") json[prop] = value(); // Call function with no parameters
             else if (type === "object") json[prop] = value;
         }
         return json;
