@@ -174,6 +174,7 @@ export interface ManagerOptions {
 
 export type Snowflake = string;
 
+export type Method = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
 /*
     Other constants
