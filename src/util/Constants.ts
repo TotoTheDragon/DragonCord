@@ -119,14 +119,14 @@ export enum Endpoints {
 }
 
 export enum CDNEndpoints {
-    CHANNEL_ICON = `/channel-icons/:channel/:channel_icon`,
+    CHANNEL_ICON = `/channel-icons/:channel/:icon`,
     CUSTOM_EMOJI = `/emojis/:emoji`,
-    DEFAULT_USER_AVATAR = `/embed/avatars/:user_discriminator`,
-    GUILD_BANNER = `/banners/:guild/:guild_banner`,
-    GUILD_DISCOVERY_SPLASH = `/discovery-splashes/:guild/:guild_discovery_splash`,
+    DEFAULT_USER_AVATAR = `/embed/avatars/:discriminator`,
+    GUILD_BANNER = `/banners/:guild/:banner`,
+    GUILD_DISCOVERY_SPLASH = `/discovery-splashes/:guild/:discovery_splash`,
     GUILD_ICON = `/icons/:guild/:guild_icon`,
-    GUILD_SPLASH = `/splashes/:guild/:guild_splash`,
-    USER_AVATAR = `/avatars/:user/:user_avatar`,
+    GUILD_SPLASH = `/splashes/:guild/:splash`,
+    USER_AVATAR = `/avatars/:user/:avatar`,
 }
 
 export enum ClientEndpoints {
