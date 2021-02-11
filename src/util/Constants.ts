@@ -17,7 +17,8 @@ export const DefaultOptions: ClientOptions = {
     restRequestTimeout: 15000,
     retryLimit: 1,
     restTimeOffset: 500,
-    restSweepInterval: 60
+    restSweepInterval: 60,
+    debug: false
 }
 
 export const DefaultManagerOptions: ManagerOptions = {
