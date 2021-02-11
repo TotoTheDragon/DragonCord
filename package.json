@@ -13,5 +13,8 @@
     "https": "^1.0.0",
     "ws": "^7.4.2",
     "zlib": "^1.0.5"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0"
   }
 }
