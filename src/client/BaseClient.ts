@@ -84,5 +84,6 @@ export interface ClientOptions {
     restSweepInterval?: number,
     retryLimit?: number,
     guildCache?: boolean,
+    userCache?: boolean,
     debug?: boolean
 }

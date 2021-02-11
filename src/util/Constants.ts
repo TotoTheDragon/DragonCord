@@ -28,6 +28,10 @@ export const DefaultManagerOptions: ManagerOptions = {
 
 export const REST_VERSION = 8;
 
+export const ImageFormats = ["webp", "png", "jpg", "jpeg", "gif"];
+
+export const ImageSizes = Array.from({ length: 9 }, (e, i) => 2 ** (i + 4));
+
 /*
     Enums
 */
@@ -117,7 +121,7 @@ export enum Endpoints {
 export enum CDNEndpoints {
     CHANNEL_ICON = `/channel-icons/:channel/:channel_icon`,
     CUSTOM_EMOJI = `/emojis/:emoji`,
-    DEFAULT_USER_AVATAR = `/embed/avatars/:user_discrim`,
+    DEFAULT_USER_AVATAR = `/embed/avatars/:user_discriminator`,
     GUILD_BANNER = `/banners/:guild/:guild_banner`,
     GUILD_DISCOVERY_SPLASH = `/discovery-splashes/:guild/:guild_discovery_splash`,
     GUILD_ICON = `/icons/:guild/:guild_icon`,
