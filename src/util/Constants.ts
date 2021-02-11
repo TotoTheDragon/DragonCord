@@ -1,11 +1,14 @@
 import { ClientOptions } from "../client/BaseClient";
-import { Collection } from "./Collection";
+import { config } from "dotenv";
+
+config({ path: "../.env" });
 
 /*
     Constant values
 */
 
 export const DefaultOptions: ClientOptions = {
+    token: process.env.DISCORD_TOKEN || undefined,
     shardCount: 1,
     messageCacheMaxSize: 200,
     messageCacheLifetime: 0,

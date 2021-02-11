@@ -10,8 +10,6 @@ export class Client extends BaseClient {
 
     guilds: GuildManager;
 
-    token: string;
-
     requestHandler: RequestHandler;
 
     constructor(options: ClientOptions = {}) {
@@ -24,9 +22,9 @@ export class Client extends BaseClient {
         this.requestHandler = new RequestHandler(this);
     }
 
-    async login(token: string): Promise<void> {
-        this.token = token;
+    async login(token?: string): Promise<void> {
+        if (!this.options.token) this.options.token = token;
         await this.ws.connect();
-        this.ws.sendIdentify(token);
+        this.ws.sendIdentify(this.options.token);
     }
 }

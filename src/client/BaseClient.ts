@@ -72,6 +72,7 @@ export class BaseClient extends EventEmitter {
 }
 
 export interface ClientOptions {
+    token?: string,
     shard?: number,
     shardCount?: number,
     messageCacheMaxSize?: number,

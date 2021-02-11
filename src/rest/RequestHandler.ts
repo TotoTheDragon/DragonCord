@@ -35,7 +35,7 @@ export class RequestHandler extends Base {
 
             try {
 
-                if (auth) headers["Authorization"] = `Bot ${this.client.token}`;
+                if (auth) headers["Authorization"] = `Bot ${this.client.options.token}`;
 
                 if (body && body.reason) headers["X-Audit-Log-Reason"] = body.reason;
                 // if (body && body.reason && method !== "POST" || !url.includes("/prune")) delete body.reason;
