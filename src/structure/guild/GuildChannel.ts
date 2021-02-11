@@ -1,6 +1,7 @@
 import { Client } from "../../client/Client";
 import { Snowflake } from "../../util/Constants";
 import { Channel } from "../Channel";
+import { TextBasedChannel } from "../interfaces/TextBasedChannel";
 import { Guild } from "./Guild";
 
 export class GuildChannel extends Channel {
@@ -28,4 +29,9 @@ export class GuildChannel extends Channel {
         this.position = data.position;
         this.categoryID = data.parent_id || null;
     }
+
+    send(content: string) { }
+
 }
+
+TextBasedChannel.applyToClass(GuildChannel, true, ['bulkDelete']);
