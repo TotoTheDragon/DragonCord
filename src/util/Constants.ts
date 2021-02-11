@@ -9,6 +9,7 @@ config({ path: "../.env" });
 
 export const DefaultOptions: ClientOptions = {
     token: process.env.DISCORD_TOKEN || undefined,
+    shard: 0,
     shardCount: 1,
     messageCacheMaxSize: 200,
     messageCacheLifetime: 0,
