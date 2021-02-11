@@ -8,6 +8,7 @@ export class WebsocketManager extends EventEmitter {
     ws: WebSocket
     heartbeatInterval: number;
     lastSequence: number;
+    seq: number;
     receivedAck: boolean;
 
     session: string;
@@ -20,7 +21,13 @@ export class WebsocketManager extends EventEmitter {
         Object.defineProperty(this, 'client', { value: client });
 
         this.heartbeatInterval = -1;
+        this.seq = 0;
         this.lastSequence = null;
+    }
+
+    send(data: any) {
+        this.ws.send(data);
+        this.seq++;
     }
 
     async connect(): Promise<void> {
@@ -29,14 +36,15 @@ export class WebsocketManager extends EventEmitter {
                 this.ws = new WebSocket("wss://gateway.discord.gg/?v=8&encoding=json");
                 this.ws.on("message", (data) => {
                     const request: DiscordGatewayPayload = JSON.parse(data.toString());
-                    const { t, op } = request;
+                    const { t, op, s } = request;
+                    this.lastSequence = s;
                     switch (op) {
                         case 0:
                             if (handlers[t]) handlers[t](this.client, request, this.client.options.shard);
-                            else console.log(`SHARD #${this.client.options.shard}:`, request);
+                            else this.client.logger.emit("DEBUG", "PAYLOAD", request);
                             break;
                         case 10:
-                            console.log("Bot connected");
+                            this.client.logger.emit("DEBUG", "CONNECT", "Bot connected to websocket");
                             this.heartbeatInterval = request.d.heartbeat_interval;
                             this.startHeartbeats();
                             resolve();
@@ -45,7 +53,7 @@ export class WebsocketManager extends EventEmitter {
                             this.receivedAck = true;
                             break;
                         default:
-                            console.log(request);
+                            this.client.logger.emit("DEBUG", "PAYLOAD", request);
                             break;
                     }
                 });
@@ -60,13 +68,13 @@ export class WebsocketManager extends EventEmitter {
         this.receivedAck = true;
         setInterval(() => {
             if (this.receivedAck === false) throw new Error("Did not receive heartbeat ack between requests");
-            console.log("Sent heartbeat");
-            this.ws.send(JSON.stringify({ "op": 1, "d": this.lastSequence }));
+            this.client.logger.emit("DEBUG", "HEARTBEAT", "seq:", this.seq);
+            this.send(JSON.stringify({ "op": 1, "d": this.seq }));
         }, this.heartbeatInterval);
     }
 
     async sendIdentify(token: string, intent: number = 13951) {
-        this.ws.send(
+        this.send(
             JSON.stringify(
                 {
                     "op": 2,
