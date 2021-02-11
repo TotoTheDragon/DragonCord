@@ -67,7 +67,7 @@ export class User extends Base {
         )
     }
 
-    serialize(props?: string[]): object {
+    serialize(props: string[] = []): object {
         return super.serialize([
             "username",
             "discriminator",

@@ -142,10 +142,6 @@ export class Guild extends Base {
             "name",
             "description",
             "available",
-            "iconURL",
-            "splashURL",
-            "discoverySplashURL",
-            "bannerURL",
             ...props
         ]
         )

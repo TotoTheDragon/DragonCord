@@ -140,4 +140,14 @@ export class Message extends Base {
         return clone;
     }
 
+    serialize(props: string[] = []): object {
+        return super.serialize([
+            "content",
+            "channelID",
+            "guildID",
+            "author",
+            ...props
+        ])
+    }
+
 }
