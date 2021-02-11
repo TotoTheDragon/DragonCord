@@ -34,13 +34,13 @@ export class ClientLogger extends EventEmitter {
 
     startListeners(...args: LogType[]) {
         if (!args.length || args.includes("LOG"))
-            this.on("LOG", (...args) => console.log(`[Shard ${this.client.options.shard || -1}]`, ...args));
+            this.on("LOG", (type, ...arg) => console.log(`[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg));
         if (!args.length || args.includes("WARN"))
-            this.on("WARN", (...args) => console.warn(`[Shard ${this.client.options.shard || -1}]`, ...args))
+            this.on("WARN", (type, ...arg) => console.warn(`[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg))
         if (!args.length || args.includes("ERROR"))
-            this.on("ERROR", (...args) => console.error(`[Shard ${this.client.options.shard || -1}]`, ...args))
+            this.on("ERROR", (type, ...arg) => console.error(`[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg))
         if (args.includes("DEBUG"))
-            this.on("DEBUG", (...args) => console.debug(`[Shard ${this.client.options.shard || -1}]`, ...args))
+            this.on("DEBUG", (type, ...arg) => console.debug(`[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg))
     }
 }
 
