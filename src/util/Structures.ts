@@ -12,5 +12,6 @@ export class Structures {
 
 const structures = {
     Guild: require('../structure/guild/Guild').Guild,
-    Message: require('../structure/Message').Message
+    Message: require('../structure/Message').Message,
+    User: require('../structure/user/User').User
 };
