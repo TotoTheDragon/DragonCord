@@ -1,5 +1,5 @@
 import { Client } from "../../client/Client";
-import { CDNEndpoints, Snowflake } from "../../util/Constants";
+import { CDNEndpoints, Snowflake, Urls } from "../../util/Constants";
 import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Util } from "../../util/Util";
 import { Base } from "../Base";
@@ -63,7 +63,7 @@ export class User extends Base {
     avatarURL({ format = 'webp', size = undefined, dynamic = true } = {}): string {
         if (dynamic) format = this.avatar.startsWith('a_') ? 'gif' : format;
         return Util.makeImageUrl(
-            Util.parseEndpoint(CDNEndpoints.USER_AVATAR, { user: this.id, avatar: this.avatar }), { format, size }
+            Util.parseEndpoint(Urls.CDN + CDNEndpoints.USER_AVATAR, { user: this.id, avatar: this.avatar }), { format, size }
         )
     }
 
