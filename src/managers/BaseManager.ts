@@ -17,7 +17,7 @@ export class BaseManager<K, T extends Base> {
         this._client = client;
 
         if (!Structures) Structures = require("../util/Structures").Structures;
-        this._holds = Structures.get(holds.name);
+        this._holds = Structures.get(holds.name) || holds;
 
         this._cache = new Collection(); // Initialize cache
 
@@ -31,7 +31,6 @@ export class BaseManager<K, T extends Base> {
         const existing = this._cache.get(data.id);
         if (existing && existing._update && cache && this._options.cache) existing._update(data);
         if (existing) return existing;
-
         const value = new this._holds(this._client, data, ...extras);
         if (cache && this._options.cache) this._cache.set(data.id, value);
         return value;
