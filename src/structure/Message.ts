@@ -3,6 +3,7 @@ import { Collection } from "../util/Collection";
 import { MessageReference, MessageTypes, Snowflake } from "../util/Constants";
 import { SnowflakeUtil } from "../util/SnowflakeUtil";
 import { Base } from "./Base";
+import { User } from "./user/User";
 
 export class Message extends Base {
 
@@ -12,7 +13,7 @@ export class Message extends Base {
     guildID?: Snowflake; // The snowflake of the guild this message was sent in
     webhookID?: Snowflake; // The snowflake of the webhook this message was sent by
 
-    author: Base; // User object of the author
+    author: User; // User object of the author
     member: Base; // GuildMember object of the author
 
     type: MessageTypes;
@@ -73,6 +74,9 @@ export class Message extends Base {
 
         this.id = data.id;
 
+        if ('author' in data) this.author = this.client.users.add(data.author);
+        else if (!this.author) this.author = null;
+
         if ('type' in data) {
             this.type = data.type;
             this.system = this.type !== MessageTypes.DEFAULT && this.type !== MessageTypes.REPLY;
@@ -83,11 +87,6 @@ export class Message extends Base {
 
         if ('content' in data) this.content = data.content;
         else if (typeof this.content !== 'string') this.content = null;
-
-
-        if ('author' in data) this.author = data.author; // TODO Change this to make an user object (get it from cache. Update/add it first)
-        else if (!this.author) this.author = null;
-
 
         if ('pinned' in data) this.pinned = Boolean(data.pinned);
         else if (typeof this.pinned !== "boolean") this.pinned = null;
@@ -123,6 +122,8 @@ export class Message extends Base {
     _update(data: any) {
         const clone: Message = this._clone();
 
+        if ('author' in data) this.author = this.client.users.add(data.author);
+        else if (!this.author) this.author = null;
         if ('edited_timestamp' in data) this.editedTimestamp = new Date(data.edited_timestamp).getTime();
         if ('content' in data) this.content = data.content;
         if ('pinned' in data) this.pinned = data.pinned;
