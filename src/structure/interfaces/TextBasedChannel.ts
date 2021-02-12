@@ -1,14 +1,15 @@
+import { APIRequest } from "../../rest/APIRequest";
 import { requestBuilder } from "../../rest/RequestBuilder";
 import { Channel } from "../Channel";
 
 export class TextBasedChannel extends Channel {
 
     async send(content: string) {
-        return requestBuilder(this.client)
+        const request: APIRequest = requestBuilder(this.client)
             .channels(this.id)
-            .messages()
-            .post({ content })
-            .make();
+            .messages
+            .post();
+        return request.setBody({ content: content }).make();
     }
 
     static applyToClass(structure, full = false, ignore = []) {
