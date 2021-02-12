@@ -22,7 +22,6 @@ export class APIRequest {
     }
 
     async make(): Promise<any> {
-        console.log(this.method, this.url, this.body)
         return this.client.requestHandler.request(
             this.method,
             this.url,
