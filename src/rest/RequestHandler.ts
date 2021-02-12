@@ -20,7 +20,7 @@ export class RequestHandler extends Base {
     }
 
     async request(method: Method, url: string, auth: boolean, body: any, file: any, _route?: string, prioritize?: boolean): Promise<object> {
-
+        this.client.logger.emit("DEBUG", "REQUEST", method, url);
         const route = _route || this.routefy(url, method);
 
         const stack = new Error().stack.substring(7);
