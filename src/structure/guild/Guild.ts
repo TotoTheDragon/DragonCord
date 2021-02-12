@@ -1,9 +1,12 @@
 import { Client } from "../../client/Client";
+import { GuildChannelManager } from "../../managers/GuildChannelManager";
 import { Snowflake } from "../../util/Constants";
 import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Base } from "../Base";
 
 export class Guild extends Base {
+
+    channels: GuildChannelManager;
 
     id: Snowflake;
 
@@ -48,6 +51,8 @@ export class Guild extends Base {
 
     constructor(client: Client, data: any) {
         super(client);
+
+        this.channels = new GuildChannelManager(this, client, undefined, { cache: client.options.channelCache });
 
         this.deleted = false;
 

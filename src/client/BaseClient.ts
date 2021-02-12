@@ -85,5 +85,6 @@ export interface ClientOptions {
     retryLimit?: number,
     guildCache?: boolean,
     userCache?: boolean,
+    channelCache?: boolean,
     debug?: boolean
 }

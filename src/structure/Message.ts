@@ -3,6 +3,9 @@ import { Collection } from "../util/Collection";
 import { MessageReference, MessageTypes, Snowflake } from "../util/Constants";
 import { SnowflakeUtil } from "../util/SnowflakeUtil";
 import { Base } from "./Base";
+import { Channel } from "./Channel";
+import { Guild } from "./guild/Guild";
+import { GuildChannel } from "./guild/GuildChannel";
 import { User } from "./user/User";
 
 export class Message extends Base {
@@ -62,8 +65,12 @@ export class Message extends Base {
         return !this.isDM;
     }
 
-    get guild(): Base {
-        return this.isGuild ? new Base(this.client) : null; // TODO Change this to lookup guild in cache
+    get guild(): Guild {
+        return this.isGuild ? this.client.guilds.resolve(this.guildID) || this.client.guilds.add({ id: this.guildID }) : null;
+    }
+
+    get channel(): GuildChannel {
+        return this.guild ? this.guild.channels.resolve(this.channelID) || this.guild.channels.add({ id: this.channelID }) : null;
     }
 
     get partial(): boolean {
