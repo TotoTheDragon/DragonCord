@@ -14,7 +14,9 @@ async function start(): Promise<void> {
 
     client.on("message", async (message: Message) => {
         if (message.author.id !== "297362162349768705") return;
-        message.channel.send("You said:", message.content, new MessageEmbed().setTitle("Repeater").setDescription(message.content));
+        if (message.isGuild)
+            message.channel.send("You said:", message.content, new MessageEmbed().setTitle("Repeater").setDescription(message.content));
+        else message.author.send("You said:", message.content, new MessageEmbed().setTitle("Repeater").setDescription(message.content));
     });
 
     await client.login();
