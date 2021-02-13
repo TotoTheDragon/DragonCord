@@ -1,6 +1,4 @@
 import { Client } from "./client/Client";
-import { requestBuilder } from "./rest/RequestBuilder";
-import { GuildChannel } from "./structure/guild/GuildChannel";
 import { Message } from "./structure/Message";
 import { MessageEmbed } from "./structure/MessageEmbed";
 
@@ -10,10 +8,10 @@ async function start(): Promise<void> {
 
     const client = new Client({ shard: 0, shardCount: 1, debug: true });
 
-    client.on("ready", () => client.logger.emit("LOG", "READY", "Bot is now ready"));
+    client.on("ready", () => client.logger.emit("LOG", "READY", "Bot is now ready in", client.guilds.cache.size, "guilds on shard", client.options.shard));
 
     client.on("message", async (message: Message) => {
-        if (message.author.id !== "297362162349768705") return;
+        if (message.author.id === client.user.id) return;
         if (message.isGuild)
             message.channel.send("You said:", message.content, new MessageEmbed().setTitle("Repeater").setDescription(message.content));
         else message.author.send("You said:", message.content, new MessageEmbed().setTitle("Repeater").setDescription(message.content));

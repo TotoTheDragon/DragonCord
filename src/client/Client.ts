@@ -5,6 +5,7 @@ import { RequestHandler } from "../rest/RequestHandler";
 import { WebsocketManager } from "../websocket/WebsocketManager";
 import { BaseClient, ClientOptions } from "./BaseClient";
 import { ClientLogger } from "./ClientLogger";
+import { ClientUser } from "./ClientUser";
 
 export class Client extends BaseClient {
 
@@ -17,6 +18,8 @@ export class Client extends BaseClient {
     requestHandler: RequestHandler;
 
     logger: ClientLogger;
+
+    user: ClientUser;
 
     constructor(options: ClientOptions = {}) {
         super(Object.assign({ _tokenType: 'Bot' }, options));
