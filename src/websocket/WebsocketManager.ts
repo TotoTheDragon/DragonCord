@@ -53,7 +53,7 @@ export class WebsocketManager extends EventEmitter {
                             this.receivedAck = true;
                             break;
                         default:
-                            this.client.logger.emit("DEBUG", "PAYLOAD", request);
+                            this.client.logger.emit("DEBUG", "PAYLOAD", JSON.stringify(request));
                             break;
                     }
                 });
