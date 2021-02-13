@@ -41,7 +41,7 @@ export class WebsocketManager extends EventEmitter {
                     switch (op) {
                         case 0:
                             if (handlers[t]) handlers[t](this.client, request, this.client.options.shard);
-                            else this.client.logger.emit("DEBUG", "PAYLOAD", request);
+                            else this.client.logger.emit("DEBUG", "PAYLOAD", JSON.stringify(request));
                             break;
                         case 10:
                             this.client.logger.emit("DEBUG", "CONNECT", "Bot connected to websocket");
