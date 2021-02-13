@@ -34,13 +34,13 @@ export class ClientLogger extends EventEmitter {
 
     startListeners(...args: LogType[]) {
         if (!args.length || args.includes("LOG"))
-            this.on("LOG", (type, ...arg) => console.log(ConsoleColors.FgBlue + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg, ConsoleColors.Reset));
+            this.on("LOG", (type, ...arg) => console.log(ConsoleColors.FgBlue + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...(arg.map(a => a.toString())), ConsoleColors.Reset));
         if (!args.length || args.includes("WARN"))
-            this.on("WARN", (type, ...arg) => console.warn(ConsoleColors.FgMagenta + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg, ConsoleColors.Reset))
+            this.on("WARN", (type, ...arg) => console.warn(ConsoleColors.FgMagenta + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...(arg.map(a => a.toString())), ConsoleColors.Reset))
         if (!args.length || args.includes("ERROR"))
-            this.on("ERROR", (type, ...arg) => console.error(ConsoleColors.FgRed + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg, ConsoleColors.Reset))
+            this.on("ERROR", (type, ...arg) => console.error(ConsoleColors.FgRed + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...(arg.map(a => a.toString())), ConsoleColors.Reset))
         if (args.includes("DEBUG"))
-            this.on("DEBUG", (type, ...arg) => console.debug(ConsoleColors.FgYellow + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...arg, ConsoleColors.Reset))
+            this.on("DEBUG", (type, ...arg) => console.debug(ConsoleColors.FgYellow + `[Shard#${this.client.options.shard || -1}]`, `[${type}]`, ...(arg.map(a => a.toString())), ConsoleColors.Reset))
     }
 }
 
