@@ -24,7 +24,7 @@ export class SnowflakeUtil {
     }
 
     static deconstruct(snowflake): DeconstructedSnowflake {
-        const BINARY = SnowflakeUtil.idToBinary(snowflake).toString().padStart(64, '0');
+        const BINARY = SnowflakeUtil.idToBinary(snowflake).toString(2).padStart(64, '0');
         const res = {
             timestamp: parseInt(BINARY.substring(0, 42), 2) + EPOCH,
             workerID: parseInt(BINARY.substring(42, 47), 2),
@@ -41,7 +41,7 @@ export class SnowflakeUtil {
         return res as DeconstructedSnowflake;
     }
 
-    static idToBinary(num) {
+    static idToBinary(num): number {
         let bin = '';
         let high = parseInt(num.slice(0, -10)) || 0;
         let low = parseInt(num.slice(-10));
@@ -53,7 +53,7 @@ export class SnowflakeUtil {
                 high = Math.floor(high / 2);
             }
         }
-        return bin;
+        return parseInt(bin);
     }
 
     static binaryToID(num) {
