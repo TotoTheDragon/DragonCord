@@ -10,7 +10,7 @@ export class BaseManager<K, T extends Base> {
 
     private readonly _client: Client;
     private readonly _holds: any;
-    private readonly _cache: Collection<K, T>;
+    readonly cache: Collection<K, T>;
     private readonly _options: ManagerOptions;
 
     constructor(client: Client, holds: any, iterable?: Iterable<T>, options: ManagerOptions = {}) {
@@ -19,30 +19,30 @@ export class BaseManager<K, T extends Base> {
         if (!Structures) Structures = require("../util/Structures").Structures;
         this._holds = Structures.get(holds.name) || holds;
 
-        this._cache = new Collection(); // Initialize cache
+        this.cache = new Collection(); // Initialize cache
 
         this._options = Util.mergeDefault(DefaultManagerOptions, options);
 
-        if (iterable) for (const i of iterable) this._cache.set(i.valueOf(), i);
+        if (iterable) for (const i of iterable) this.cache.set(i.valueOf(), i);
     }
 
     add(data: any, cache = true, ...extras: any): T {
         if (data === undefined || data === null) return null;
-        const existing = this._cache.get(data.id);
+        const existing = this.cache.get(data.id);
         if (existing && existing._update && cache && this._options.cache) existing._update(data);
         if (existing) return existing;
         const value = new this._holds(this._client, data, ...extras);
-        if (cache && this._options.cache) this._cache.set(data.id, value);
+        if (cache && this._options.cache) this.cache.set(data.id, value);
         return value;
     }
 
     clearCache() {
-        this._cache.clear();
+        this.cache.clear();
     }
 
     resolve(idOrInstance: K | T): T {
         if (idOrInstance instanceof this._holds) return idOrInstance as T;
-        if (typeof idOrInstance === 'string') return this._cache.get(idOrInstance) || null;
+        if (typeof idOrInstance === 'string') return this.cache.get(idOrInstance) || null;
         return null;
     }
 
@@ -53,6 +53,6 @@ export class BaseManager<K, T extends Base> {
     }
 
     valueOf() {
-        return this._cache;
+        return this.cache;
     }
 }
