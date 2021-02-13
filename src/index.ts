@@ -1,22 +1,22 @@
 import { Client } from "./client/Client";
-import { WebsocketManager } from "./websocket/WebsocketManager";
+import { requestBuilder } from "./rest/RequestBuilder";
+import { GuildChannel } from "./structure/guild/GuildChannel";
+import { Message } from "./structure/Message";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 async function start(): Promise<void> {
 
-    const client1 = new Client({ shard: 0, shardCount: 2 });
+    const client = new Client({ shard: 0, shardCount: 1, debug: true });
 
-    const client2 = new Client({ shard: 1, shardCount: 2 });
+    client.on("ready", () => client.logger.emit("LOG", "READY", "Bot is now ready"));
 
-    client1.on("ready", () => console.log("Bot ready (shard 0)"))
-    client2.on("ready", () => console.log("Bot ready (shard 1)"))
+    client.on("message", async (message: Message) => {
+        if (message.author.id !== "297362162349768705") return;
+        message.channel.send("You said:", message.content);
+    });
 
-    await client1.login("ODA2NjQ0MjEyOTc1NTM0MTQw.YBsb9w.S5cEIP4Z8BK2ImBLTsZ4Vejtn4g");
-
-    await delay(5000);
-
-    await client2.login("ODA2NjQ0MjEyOTc1NTM0MTQw.YBsb9w.S5cEIP4Z8BK2ImBLTsZ4Vejtn4g");
+    await client.login();
 }
 
 start();
