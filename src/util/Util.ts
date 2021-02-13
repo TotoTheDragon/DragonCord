@@ -1,5 +1,5 @@
 import { CustomError } from "../errors/CustomError";
-import { ImageFormats, ImageSizes } from "./Constants";
+import { Colors, ImageFormats, ImageSizes } from "./Constants";
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
 const isObject = d => typeof d === 'object' && d !== null;
@@ -32,4 +32,20 @@ export class Util {
         if (size && !ImageSizes.includes(size)) throw new CustomError("INVALID_IMAGE_SIZE", size);
         return `${root}.${format}${size ? `?size=${size}` : ''}`;
     }
+
+    static resolveColor(color) {
+        if (typeof color === 'string') {
+            if (color === 'RANDOM') return Math.floor(Math.random() * (0xffffff + 1));
+            if (color === 'DEFAULT') return 0;
+            color = Colors[color] || parseInt(color.replace('#', ''), 16);
+        } else if (Array.isArray(color)) {
+            color = (color[0] << 16) + (color[1] << 8) + color[2];
+        }
+
+        if (color < 0 || color > 0xffffff) throw new RangeError('COLOR_RANGE');
+        else if (color && isNaN(color)) throw new TypeError('COLOR_CONVERT');
+
+        return color;
+    }
+
 }
