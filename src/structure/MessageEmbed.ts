@@ -34,7 +34,7 @@ export class MessageEmbed {
 
         this.fields = [];
         if (data.fields) {
-            this.fields = skipValidation ? data.fields.map(Util.cloneObject) : this.constructor.normalizeFields(data.fields);
+            this.fields = skipValidation ? data.fields.map(Util.cloneObject) : MessageEmbed.normalizeFields(data.fields);
         }
 
         this.thumbnail = data.thumbnail
@@ -88,11 +88,7 @@ export class MessageEmbed {
             }
             : null;
 
-        /**
-         * The files of this embed
-         * @type {Array<FileOptions|string|MessageAttachment>}
-         */
-        this.files = data.files || [];
+        //this.files = data.files || [];
     }
 
     /**

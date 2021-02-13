@@ -48,4 +48,8 @@ export class Util {
         return color;
     }
 
+    static cloneObject(obj) {
+        return Object.assign(Object.create(obj), obj);
+    }
+
 }
