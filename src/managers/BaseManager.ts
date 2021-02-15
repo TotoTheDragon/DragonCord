@@ -1,5 +1,5 @@
 import { Client } from "../client/Client";
-import { Collection } from "../util/Collection";
+import { Collection } from "@developerdragon/dragoncordapi";
 import { DefaultManagerOptions, ManagerOptions } from "../util/Constants";
 import { Util } from "../util/Util";
 import { Base } from "../structure/Base";

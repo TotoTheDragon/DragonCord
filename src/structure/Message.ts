@@ -1,5 +1,5 @@
+import { Collection } from "@developerdragon/dragoncordapi";
 import { Client } from "../client/Client";
-import { Collection } from "../util/Collection";
 import { MessageReference, MessageTypes, Snowflake } from "../util/Constants";
 import { SnowflakeUtil } from "../util/SnowflakeUtil";
 import { Base } from "./Base";
