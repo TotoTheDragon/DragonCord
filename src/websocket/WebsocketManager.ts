@@ -68,8 +68,8 @@ export class WebsocketManager extends EventEmitter {
         this.receivedAck = true;
         setInterval(() => {
             if (this.receivedAck === false) throw new Error("Did not receive heartbeat ack between requests");
-            this.client.logger.emit("DEBUG", "HEARTBEAT", "seq:", this.seq);
-            this.send(JSON.stringify({ "op": 1, "d": this.seq }));
+            this.client.logger.emit("DEBUG", "HEARTBEAT", "seq:", this.lastSequence);
+            this.send(JSON.stringify({ "op": 1, "d": this.lastSequence }));
         }, this.heartbeatInterval);
     }
 
