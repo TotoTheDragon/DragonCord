@@ -9,6 +9,7 @@
   "author": "DeveloperDragon (me@developerdragon.com)",
   "license": "ISC",
   "dependencies": {
+    "@developerdragon/concordiaclient": "^1.0.3",
     "@developerdragon/dragoncordapi": "^1.0.2",
     "@types/ws": "^7.4.0",
     "https": "^1.0.0",
