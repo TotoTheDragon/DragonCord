@@ -18,15 +18,6 @@ export class Util {
         return given;
     }
 
-    static parseEndpoint(endpoint: string, args: object): string {
-        Object
-            .keys(args)
-            .forEach(key => {
-                endpoint = endpoint.replace(new RegExp(`:${key}`, "g"), args[key]);
-            })
-        return endpoint;
-    }
-
     static makeImageUrl(root: string, { format = 'webp', size = undefined } = {}): string {
         if (format && !ImageFormats.includes(format)) throw new CustomError("INVALID_IMAGE_FORMAT", format);
         if (size && !ImageSizes.includes(size)) throw new CustomError("INVALID_IMAGE_SIZE", size);
