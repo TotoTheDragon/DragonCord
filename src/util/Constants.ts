@@ -1,7 +1,8 @@
-import { ClientOptions } from "../client/BaseClient";
-import { config } from "dotenv";
 import { CacheOptions } from "@developerdragon/advancedcache";
+import { config } from "dotenv";
 import moment from "moment";
+import { ClientOptions } from "../client/BaseClient";
+import { DCFile } from "./DCFile";
 
 config({ path: "../.env" });
 
@@ -129,6 +130,124 @@ export interface ManagerOptions {
     cacheOptions?: CacheOptions
 }
 
+export interface DiscordMessageContent {
+    content?: string,
+    embed?: any,
+    allowedMentions?: any,
+    tts?: boolean
+}
+
+/*
+    Method parameters for options
+*/
+
+export interface CreateChannelOptions {
+    name?: string
+    bitrate?: number,
+    nsfw?: boolean,
+    parentID?: string,
+    permissionOverwrites?: any[],
+    messageCooldown?: number,
+    topic?: string,
+    userLimit?: number,
+    reason?: string
+}
+
+export interface CreateChannelInviteOptions {
+    maxAge?: number,
+    maxUses?: number,
+    temporary?: boolean,
+    unique?: boolean,
+    reason?: string
+}
+
+export interface CreateChannelWebhookOptions {
+    name?: string,
+    avatar?: string,
+    reason?: string
+}
+
+export interface CreateGuildOptions {
+    name?: string
+    region?: string,
+    icon?: string,
+    verificationLevel?: number,
+    defaultNotifications?: number,
+    explicitContentFilter?: number,
+    systemChannelID?: Snowflake,
+    afkChannelID?: Snowflake,
+    afkTimeout?: number,
+    roles?: any[],
+    channels?: any[]
+}
+
+export interface CreateGuildEmojiOptions {
+    name: string,
+    image: string,
+    roles?: Snowflake[],
+    reason?: string
+}
+
+export interface CreateRoleOptions {
+    name?: string,
+    color?: number,
+    hoist?: boolean,
+    mentionable?: boolean,
+    permissions?: number,
+    reason?: string
+}
+
+export interface EditGuildIntegration {
+    expireBehavior?: string,
+    expireGracePeriod?: string,
+    enableEmoticons?: boolean
+}
+
+export interface EditGuildMemberOptions {
+    roles?: Snowflake[],
+    nick?: string,
+    mute?: boolean,
+    deafen?: boolean,
+    channelID?: Snowflake,
+    reason?: string
+}
+
+export interface EditBotUserOptions {
+    username?: string,
+    avatar?: string
+}
+
+export interface VoiceChannelOptions {
+    opusOnly?: boolean,
+    shared?: boolean
+}
+
+export interface PruneMembersOptions {
+    computePruneCount?: boolean,
+    days?: number,
+    includeRoles?: Snowflake[],
+    reason?: string
+}
+
+export interface StatusOptions {
+    status?: UserStatus,
+    name?: string,
+    type?: number,
+    url?: string
+}
+
+export interface WebhookOptions {
+    allowedMentions?: any,
+    auth?: boolean,
+    avatarURL?: string,
+    content?: string,
+    embeds?: any[],
+    file?: DCFile | DCFile[],
+    tts?: boolean,
+    username?: string,
+    wait?: boolean
+}
+
 /*
     Types
 */
@@ -136,6 +255,8 @@ export interface ManagerOptions {
 export type Snowflake = string;
 
 export type Method = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
+
+export type UserStatus = "online" | "idle" | "dnd" | "invisible";
 
 /*
     Other constants
