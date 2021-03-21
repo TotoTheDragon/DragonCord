@@ -137,6 +137,14 @@ export interface DiscordMessageContent {
     tts?: boolean
 }
 
+export interface DiscordEditMessageContent {
+    [x: string]: any;
+    content?: string,
+    embed?: any,
+    allowedMentions?: any,
+    flags?: number
+}
+
 /*
     Method parameters for options
 */

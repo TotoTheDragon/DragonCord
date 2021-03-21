@@ -3,7 +3,7 @@ import { ConcordiaClient } from "@developerdragon/concordiaclient";
 import { GuildManager } from "../managers/GuildManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
-import { CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordMessageContent, EditBotUserOptions, EditGuildIntegration, EditGuildMemberOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
+import { CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditGuildIntegration, EditGuildMemberOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
 import { Endpoints } from "../util/Endpoints";
 import { WebsocketManager } from "../websocket/WebsocketManager";
@@ -245,11 +245,33 @@ export class Client extends BaseClient {
     */
 
     createMessage(channelID: Snowflake, content: string | DiscordMessageContent, file: DCFile | DCFile[]): Promise<any> {
-        return
+        if (channelID === undefined) return;
+        if (content != null) {
+            // Make sure content we are sending is actually a string
+            if (typeof content === "object")
+                if (content.content !== undefined && typeof content.content !== "string")
+                    content.content = "" + content.content;
+
+            // Turn string into object
+            if (typeof content !== "object" || content === null) {
+                content = {
+                    content: "" + content
+                }
+            }
+
+            // We are trying to send an empty message
+            if (content.content === undefined && !content.embed && !file) {
+                return Promise.reject(new Error("No content, file, or embed"));
+            }
+        }
+        else if (file == null)
+            return Promise.reject(new Error("No content, file, or embed"));
+
+        return this.requestHandler.request("POST", Endpoints.CHANNEL_MESSAGES(channelID), true, content, file);
     }
 
-    deleteMessage(channelID: Snowflake, messageID: Snowflake): Promise<any> {
-        return
+    deleteMessage(channelID: Snowflake, messageID: Snowflake, reason?: string): Promise<any> {
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_MESSAGE(channelID, messageID), true, { reason });
     }
 
     deleteMessages(channeLID: Snowflake, messageIDs: Snowflake[], reason: string): Promise<any> {
@@ -264,8 +286,20 @@ export class Client extends BaseClient {
         return
     }
 
-    editMessage(channelID: Snowflake, messageID: Snowflake, content: string | DiscordMessageContent): Promise<any> {
-        return
+    editMessage(channelID: Snowflake, messageID: Snowflake, content: string | DiscordEditMessageContent): Promise<any> {
+        if (content !== undefined) {
+            if (typeof content !== "object" || content === null) {
+                content = {
+                    content: "" + content
+                };
+            } else if (content.content !== undefined && typeof content.content !== "string") {
+                content.content = "" + content.content;
+            } else if (content.content === undefined && !content.embed && content.flags === undefined) {
+                return Promise.reject(new Error("No content, embed or flags"));
+            }
+            content.allowed_mentions = this._formatAllowedMentions(content.allowedMentions);
+        }
+        return this.requestHandler.request("PATCH", Endpoints.CHANNEL_MESSAGE(channelID, messageID), true, content);
     }
 
     getMessage(channelID: Snowflake, messageID: Snowflake): Promise<any> {
@@ -401,6 +435,41 @@ export class Client extends BaseClient {
 
     getSelf(): Promise<any> {
         return
+    }
+
+    _formatAllowedMentions(allowed) {
+
+        if (!allowed) return {
+            parse: ["everyone"],
+            users: [],
+            roles: []
+        }; // Default value
+
+        const result = {
+            parse: [],
+            roles: [],
+            users: []
+        };
+        if (allowed.everyone) {
+            result.parse.push("everyone");
+        }
+        if (allowed.roles === true) {
+            result.parse.push("roles");
+        } else if (Array.isArray(allowed.roles)) {
+            if (allowed.roles.length > 100) {
+                throw new Error("Allowed role mentions cannot exceed 100.");
+            }
+            result.roles = allowed.roles;
+        }
+        if (allowed.users === true) {
+            result.parse.push("users");
+        } else if (Array.isArray(allowed.users)) {
+            if (allowed.users.length > 100) {
+                throw new Error("Allowed user mentions cannot exceed 100.");
+            }
+            result.users = allowed.users;
+        }
+        return result;
     }
 
 
