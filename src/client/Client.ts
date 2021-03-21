@@ -3,7 +3,7 @@ import { ConcordiaClient } from "@developerdragon/concordiaclient";
 import { GuildManager } from "../managers/GuildManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
-import { CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditGuildIntegration, EditGuildMemberOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
+import { CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
 import { Endpoints } from "../util/Endpoints";
 import { WebsocketManager } from "../websocket/WebsocketManager";
@@ -55,23 +55,61 @@ export class Client extends BaseClient {
     */
 
     addGuildMemberRole(guildID: Snowflake, memberID: Snowflake, roleID: Snowflake, reason: string): Promise<any> {
-        return
+        return this.requestHandler.request("PUT", Endpoints.GUILD_MEMBER_ROLE(guildID, memberID, roleID), true, { reason });
     }
 
-    banGuildMember(guildID: Snowflake, userID: Snowflake, deleteMessageDays: number, reason: string): Promise<any> {
-        return
+    banGuildMember(guildID: Snowflake, memberID: Snowflake, deleteMessageDays: number, reason: string): Promise<any> {
+        if (isNaN(deleteMessageDays) || (deleteMessageDays < 0 || deleteMessageDays > 7))
+            return Promise.reject(new Error(`Invalid deleteMessageDays value (${deleteMessageDays}), should be a number between 0-7 inclusive`));
+
+        return this.requestHandler.request("PUT", Endpoints.GUILD_BAN(guildID, memberID), true, {
+            delete_message_days: deleteMessageDays || 0,
+            reason
+        });
     }
 
-    createChannel(guildID: Snowflake, name: string, options?: CreateChannelOptions): Promise<any> {
-        return
+    // type 0 (text), 2 (voice), or 4 (category)
+    createChannel(guildID: Snowflake, name: string, type: number, options?: CreateChannelOptions): Promise<any> {
+        return this.requestHandler.request("POST", Endpoints.GUILD_CHANNELS(guildID), true, {
+            name,
+            type,
+            bitrate: options?.bitrate,
+            nsfw: options?.nsfw,
+            parent_id: options?.parentID,
+            permission_overwrites: options?.permissionOverwrites,
+            rate_limit_per_user: options?.messageCooldown,
+            reason: options?.reason,
+            topic: options?.topic,
+            user_limit: options?.userLimit
+        });
     }
 
     createChannelInvite(channelID: Snowflake, options?: CreateChannelInviteOptions): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.CHANNEL_INVITES(channelID), true, {
+            max_age: options?.maxAge,
+            max_uses: options?.maxUses,
+            temporary: options?.temporary,
+            unique: options?.unique,
+            reason: options?.reason
+        });
     }
 
     createGuild(name: string, options?: CreateGuildOptions): Promise<any> {
-        return
+        if (this.guilds.cache.size >= 10)
+            Promise.reject("This method cannot be used when in 10 or more guilds");
+        return this.requestHandler.request("POST", Endpoints.GUILDS(), true, {
+            name: name,
+            region: options?.region,
+            icon: options?.icon,
+            verification_level: options?.verificationLevel,
+            default_message_notifications: options?.defaultNotifications,
+            explicit_content_filter: options?.explicitContentFilter,
+            system_channel_id: options?.systemChannelID,
+            afk_channel_id: options?.afkChannelID,
+            afk_timeout: options?.afkTimeout,
+            roles: options?.roles,
+            channels: options?.channels
+        });
     }
 
     createGuildEmoji(name: string, options: CreateGuildEmojiOptions): Promise<any> {
@@ -102,8 +140,26 @@ export class Client extends BaseClient {
         return
     }
 
-    editGuild(guildID: Snowflake, options: CreateGuildOptions): Promise<any> {
-        return
+    editGuild(guildID: Snowflake, options: EditGuildOptions): Promise<any> {
+        return this.requestHandler.request("PATCH", Endpoints.GUILD(guildID), true, {
+            name: options.name,
+            region: options.region,
+            icon: options.icon,
+            verification_level: options.verificationLevel,
+            default_message_notifications: options.defaultNotifications,
+            explicit_content_filter: options.explicitContentFilter,
+            system_channel_id: options.systemChannelID,
+            rules_channel_id: options.rulesChannelID,
+            public_updates_channel_id: options.publicUpdatesChannelID,
+            preferred_locale: options.preferredLocale,
+            afk_channel_id: options.afkChannelID,
+            afk_timeout: options.afkTimeout,
+            owner_id: options.ownerID,
+            splash: options.splash,
+            banner: options.banner,
+            description: options.description,
+            reason: options.reason
+        })
     }
 
     editGuildEmoji(guildID: Snowflake, emojiID: Snowflake, options: CreateGuildEmojiOptions) {
@@ -346,7 +402,7 @@ export class Client extends BaseClient {
         return
     }
 
-    editChannel(channeLID: Snowflake, options: CreateChannelOptions): Promise<any> {
+    editChannel(channeLID: Snowflake, options: EditChannelOptions): Promise<any> {
         return
     }
 

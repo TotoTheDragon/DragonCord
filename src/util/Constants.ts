@@ -150,7 +150,6 @@ export interface DiscordEditMessageContent {
 */
 
 export interface CreateChannelOptions {
-    name?: string
     bitrate?: number,
     nsfw?: boolean,
     parentID?: string,
@@ -159,6 +158,10 @@ export interface CreateChannelOptions {
     topic?: string,
     userLimit?: number,
     reason?: string
+}
+
+export interface EditChannelOptions extends CreateChannelOptions {
+    name?: string
 }
 
 export interface CreateChannelInviteOptions {
@@ -176,7 +179,6 @@ export interface CreateChannelWebhookOptions {
 }
 
 export interface CreateGuildOptions {
-    name?: string
     region?: string,
     icon?: string,
     verificationLevel?: number,
@@ -187,6 +189,18 @@ export interface CreateGuildOptions {
     afkTimeout?: number,
     roles?: any[],
     channels?: any[]
+}
+
+export interface EditGuildOptions extends CreateGuildOptions {
+    name?: string
+    rulesChannelID?: Snowflake;
+    publicUpdatesChannelID?: Snowflake;
+    preferredLocale?: string;
+    ownerID?: Snowflake;
+    splash?: string;
+    banner?: string;
+    description?: string;
+    reason?: string;
 }
 
 export interface CreateGuildEmojiOptions {
