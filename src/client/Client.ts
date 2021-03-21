@@ -300,7 +300,7 @@ export class Client extends BaseClient {
         Message methods
     */
 
-    createMessage(channelID: Snowflake, content: string | DiscordMessageContent, file: DCFile | DCFile[]): Promise<any> {
+    createMessage(channelID: Snowflake, content: string | DiscordMessageContent, file?: DCFile | DCFile[]): Promise<any> {
         if (channelID === undefined) return;
         if (content != null) {
             // Make sure content we are sending is actually a string
