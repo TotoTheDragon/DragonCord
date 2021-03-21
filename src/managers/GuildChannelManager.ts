@@ -1,10 +1,10 @@
 import { Client } from "../client/Client";
 import { Guild } from "../structure/guild/Guild";
 import { GuildChannel } from "../structure/guild/GuildChannel";
-import { ManagerOptions, Snowflake } from "../util/Constants";
+import { ManagerOptions } from "../util/Constants";
 import { BaseManager } from "./BaseManager";
 
-export class GuildChannelManager extends BaseManager<Snowflake, GuildChannel> {
+export class GuildChannelManager extends BaseManager<GuildChannel> {
 
     guild: Guild;
 
