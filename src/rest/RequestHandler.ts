@@ -5,6 +5,9 @@ import { Client } from "../client/Client";
 import { AsyncError } from "../errors/AsyncError";
 import { Base } from "../structure/Base";
 import { Method, REST_VERSION, Urls } from "../util/Constants";
+import { DCFile } from "../util/DCFile";
+import { Util } from "../util/Util";
+import { MultipartData } from "../util/MultipartData";
 
 export class RequestHandler extends Base {
 
@@ -19,17 +22,20 @@ export class RequestHandler extends Base {
         this.userAgent = `DiscordBot (https://github.com/TotoTheDragon/DragonCord, ${require("../../package.json").version})`;
     }
 
-    async request(method: Method, url: string, auth: boolean, body: any, file: any, _route?: string, prioritize?: boolean): Promise<object> {
-        this.client.logger.emit("DEBUG", "REQUEST", method, url, JSON.stringify(body) || "");
+    async request(method: Method, url: string, auth: boolean, body?: any, file?: DCFile | DCFile[], _route?: string, prioritize?: boolean): Promise<object> {
+        this.client.logger.emit("DEBUG", "REQUEST", method, url, body ? JSON.stringify(body) || "" : "");
         const route = _route || this.routefy(url, method);
 
         const stack = new Error().stack.substring(7);
 
         return new Promise((resolve, reject) => {
 
-            const headers = {};
-            headers["User-Agent"] = this.userAgent;
-            headers["Accept-Encoding"] = "gzip,deflate";
+            const headers = {
+                "User-Agent": this.userAgent,
+                "Accept-Encoding": "gzip,deflate",
+                "X-RateLimit-Precision": "millisecond"
+            };
+
             let data;
             let finalURL = url;
 
@@ -38,10 +44,21 @@ export class RequestHandler extends Base {
                 if (auth) headers["Authorization"] = `Bot ${this.client.options.token}`;
 
                 if (body && body.reason) headers["X-Audit-Log-Reason"] = body.reason;
-                // if (body && body.reason && method !== "POST" || !url.includes("/prune")) delete body.reason;
+                if (body && body.reason && (method !== "POST" || !url.includes("/prune"))) delete body.reason;
 
-                if (file) {
+                if (file != null) {
+                    const files: DCFile[] = Util.toArray(file);
 
+                    data = new MultipartData();
+
+                    headers["Content-Type"] = "multipart/form-data; boundary=" + data.boundary;
+
+                    files.forEach(f => {
+                        if (f.file) data.attach(f.name, f.file, f.name);
+                    });
+                    if (body) data.attach("payload_json", body);
+
+                    data = data.finish();
                 } else if (body) {
                     if (method === "GET" || method === "DELETE") {
                         let qs = "";

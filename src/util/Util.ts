@@ -43,4 +43,8 @@ export class Util {
         return Object.assign(Object.create(obj), obj);
     }
 
+    static toArray(input: any): any[] {
+        return Array.isArray(input) ? input : Array.of(input);
+    }
+
 }
