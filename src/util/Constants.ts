@@ -285,3 +285,140 @@ export type UserStatus = "online" | "idle" | "dnd" | "invisible";
 */
 
 export const BASE_URL = Urls.Base + REST_VERSION;
+
+/*
+    Websocket
+*/
+
+export enum GatewayOPCodes {
+    EVENT = 0,
+    HEARTBEAT = 1,
+    IDENTIFY = 2,
+    STATUS_UPDATE = 3,
+    VOICE_STATE_UPDATE = 4,
+    VOICE_STATE_PING = 5,
+    RESUME = 6,
+    REQUEST_GUILD_MEMBERS = 8,
+    INVALID_SESSION = 9,
+    HELLO = 10,
+    ACK = 11,
+    GUILD_SYNC = 12,
+    CALL_SYNC = 13
+}
+
+export enum GatewayCloseCodes {
+    NO_ERROR = 1000,
+    UNKNOWN_ERROR = 4000,
+    UNKNOWN_OP = 4001,
+    DECODE_ERROR = 4002,
+    NOT_AUTHENTICATED = 4003,
+    AUTHENTICATION_FAILED = 4004,
+    ALREADY_AUTHENTICATED = 4005,
+    INVALID_SEQUENCE = 4007,
+    RATE_LIMITED = 4008,
+    SESSION_TIMEOUT = 4009,
+    INVALID_SHARD = 4010,
+    SHARDING_REQUIRED = 4011,
+    INVALID_API_VERSION = 4012,
+    INVALID_INTENTS = 4013,
+    DISALLOWED_INTENTS = 4014
+}
+
+export enum VoiceOPCodes {
+    IDENTIFY = 0,
+    SELECT_PROTOCOL = 1,
+    READY = 2,
+    HEARTBEAT = 3,
+    SESSION_DESCRIPTION = 4,
+    SPEAKING = 5,
+    HEARTBEAT_ACK = 6,
+    RESUME = 7,
+    HELLO = 8,
+    RESUMED = 9,
+    DISCONNECT = 13
+}
+
+export enum VoiceCloseCodes {
+    NO_ERROR = 1000,
+    UNKNOWN_OP = 4001,
+    DECODE_ERROR = 4002,
+    NOT_AUTHENTICATED = 4003,
+    AUTHENTICATION_FAILED = 4004,
+    ALREADY_AUTHENTICATED = 4005,
+    SESSION_INVALID = 4006,
+    SESSION_TIMEOUT = 4009,
+    SERVER_NOT_FOUND = 4011,
+    UNKNOWN_PROTOCOL = 4012,
+    DISCONNECTED = 4014,
+    VOICE_SERVER_CRASHED = 4015,
+    UNKNOWN_ENCRYPTION = 4016
+}
+
+export enum GatewayEvent {
+
+    PRESENCE_UPDATE = "presenceUpdate",
+    VOICE_STATE_UPDATE = "voiceStateUpdate",
+    TYPING_START = "typingStart",
+
+    RESUMED = "resumed",
+    READY = "ready",
+    VOICE_SERVER_UPDATE = "voiceServerUpdate",
+    USER_UPDATE = "userUpdate",
+
+    /*
+        Messages
+    */
+
+    MESSAGE_CREATE = "messageCreate",
+    MESSAGE_UPDATE = "messageUpdate",
+    MESSAGE_DELETE = "messageDelete",
+    MESSAGE_DELETE_BULK = "messageDeleteBulk",
+    MESSAGE_REACTION_ADD = "messageReactionAdd",
+    MESSAGE_REACTION_REMOVE = "messageReactionRemove",
+    MESSAGE_REACTION_REMOVE_ALL = "messageReactionRemoveAll",
+    MESSAGE_REACTION_REMOVE_EMOJI = "messageReactionRemoveEmoji",
+
+    MESSAGE_ACK = "messageAck",
+
+    /*
+        Guilds
+    */
+
+    GUILD_MEMBER_ADD = "guildMemberAdd",
+    GUILD_MEMBER_UPDATE = "guildMemberUpdate",
+    GUILD_MEMBER_REMOVE = "guildMemberRemove",
+    GUILD_CREATE = "guildCreate",
+    GUILD_UPDATE = "guildUpdate",
+    GUILD_DELETE = "guildDelete",
+    GUILD_BAN_ADD = "guildBanAdd",
+    GUILD_BAN_REMOVE = "guildBanRemove",
+    GUILD_ROLE_CREATE = "guildRoleCreate",
+    GUILD_ROLE_UPDATE = "guildRoleUpdate",
+    GUILD_ROLE_DELETE = "guildRoleDelete",
+    GUILD_MEMBERS_CHUNK = "guildMemberChunk",
+    GUILD_SYNC = "guildSync",
+    GUILD_EMOJIS_UPDATE = "guildEmojisUpdate",
+
+    PRESENCES_REPLACE = "presencesReplace",
+
+    /*
+        Invites
+    */
+
+    INVITE_CREATE = "inviteCreate",
+    INVITE_DELETE = "inviteDelete",
+
+    /*
+        Channels
+    */
+
+    CHANNEL_CREATE = "channelCreate",
+    CHANNEL_UPDATE = "channelUpdate",
+    CHANNEL_DELETE = "channelDelete",
+    CHANNEL_PINS_UPDATE = "channelPinUpdate",
+    WEBHOOKS_UPDATE = "webhooksUpdate",
+    CALL_CREATE = "callCreate",
+    CALL_UPDATE = "callUpdate",
+    CALL_DELETE = "callDelete"
+
+}
