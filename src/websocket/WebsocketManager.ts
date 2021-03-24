@@ -2,6 +2,7 @@ import { EventEmitter } from "events";
 import WebSocket from "ws";
 import { Client } from "../client/Client";
 import { handlers } from "./handlers";
+import { GatewayOPCodes } from "../util/Constants";
 
 export class WebsocketManager extends EventEmitter {
 
@@ -25,6 +26,10 @@ export class WebsocketManager extends EventEmitter {
         this.lastReceivedSequence = null;
     }
 
+    sendPacket(op: GatewayOPCodes, data: any, t?: string) {
+
+    }
+
     send(data: any) {
         this.ws.send(data);
         this.sequence++;
@@ -39,17 +44,17 @@ export class WebsocketManager extends EventEmitter {
                     const { t, op, s } = request;
                     this.lastReceivedSequence = s;
                     switch (op) {
-                        case 0:
+                        case GatewayOPCodes.EVENT:
                             if (handlers[t]) handlers[t](this.client, request, this.client.options.shard);
                             else this.client.logger.emit("DEBUG", "PAYLOAD", JSON.stringify(request));
                             break;
-                        case 10:
+                        case GatewayOPCodes.HELLO:
                             this.client.logger.emit("DEBUG", "CONNECT", "Bot connected to websocket");
                             this.heartbeatInterval = request.d.heartbeat_interval;
                             this.startHeartbeats();
                             resolve();
                             break;
-                        case 11:
+                        case GatewayOPCodes.ACK:
                             this.receivedAck = true;
                             break;
                         default:
@@ -67,9 +72,9 @@ export class WebsocketManager extends EventEmitter {
         if (this.heartbeatInterval === -1) throw Error("Not yet connected to discord, but tried to start heartbeats");
         this.receivedAck = true;
         setInterval(() => {
-            if (this.receivedAck === false) throw new Error("Did not receive heartbeat ack between requests");
+            if (!this.receivedAck) throw new Error("Did not receive heartbeat ack between requests");
             this.client.logger.emit("DEBUG", "HEARTBEAT", "seq:", this.lastReceivedSequence);
-            this.send(JSON.stringify({ "op": 1, "d": this.lastReceivedSequence }));
+            this.send(JSON.stringify({ "op": GatewayOPCodes.HEARTBEAT, "d": this.lastReceivedSequence }));
         }, this.heartbeatInterval);
     }
 
@@ -77,7 +82,7 @@ export class WebsocketManager extends EventEmitter {
         this.send(
             JSON.stringify(
                 {
-                    "op": 2,
+                    "op": GatewayOPCodes.IDENTIFY,
                     "d": {
                         "token": token,
                         "intents": intent,
