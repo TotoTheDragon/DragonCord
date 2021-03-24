@@ -3,7 +3,7 @@ import { ConcordiaClient } from "@developerdragon/concordiaclient";
 import { GuildManager } from "../managers/GuildManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
-import { CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
+import { ChannelTypes, CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
 import { Endpoints } from "../util/Endpoints";
 import { WebsocketManager } from "../websocket/WebsocketManager";
@@ -69,7 +69,8 @@ export class Client extends BaseClient {
     }
 
     // type 0 (text), 2 (voice), or 4 (category)
-    createChannel(guildID: Snowflake, name: string, type: number, options?: CreateChannelOptions): Promise<any> {
+    createChannel(guildID: Snowflake, name: string, type: number | ChannelTypes | string, options?: CreateChannelOptions): Promise<any> {
+        if (typeof type === "string") type = ChannelTypes[type as string];
         return this.requestHandler.request("POST", Endpoints.GUILD_CHANNELS(guildID), true, {
             name,
             type,
@@ -394,11 +395,11 @@ export class Client extends BaseClient {
         Channel methods
     */
 
-    deleteChannel(channelID: Snowflake, reason: string): Promise<any> {
-        return
+    deleteChannel(channelID: Snowflake, reason?: string): Promise<any> {
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL(channelID), true, { reason });
     }
 
-    deleteChannelPermission(channelID: Snowflake, overwriteID: Snowflake, reason: string): Promise<any> {
+    deleteChannelPermission(channelID: Snowflake, overwriteID: Snowflake, reason?: string): Promise<any> {
         return
     }
 
