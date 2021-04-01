@@ -73,14 +73,15 @@ export enum MessageTypes {
     APPLICATION_COMMAND = 20
 }
 
-export enum ChannelTypes {
+export enum ChannelType {
     TEXT = 0,
     DM = 1,
     VOICE = 2,
-    GROUP = 3,
+    // GROUP not implemented because we do not support user accounts
     CATEGORY = 4,
     NEWS = 5,
-    STORE = 6
+    STORE = 6,
+    STAGE = 13
 };
 
 export enum Colors {

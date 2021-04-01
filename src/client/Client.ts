@@ -1,9 +1,10 @@
 
 import { ConcordiaClient } from "@developerdragon/concordiaclient";
 import { GuildManager } from "../managers/GuildManager";
+import { PrivateChannelManager } from "../managers/PrivateChannelManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
-import { ChannelTypes, CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
+import { ChannelType, CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
 import { Endpoints } from "../util/Endpoints";
 import { WebsocketManager } from "../websocket/WebsocketManager";
@@ -16,6 +17,8 @@ export class Client extends BaseClient {
     ws: WebsocketManager;
 
     guilds: GuildManager;
+
+    privateChannels: PrivateChannelManager;
 
     users: UserManager;
 
@@ -35,6 +38,8 @@ export class Client extends BaseClient {
         this.guilds = new GuildManager(this, undefined, { cache: options.guildCache });
 
         this.users = new UserManager(this, undefined, { cache: options.userCache });
+
+        this.privateChannels = new PrivateChannelManager(this, undefined, { cache: true });
 
         this.requestHandler = new RequestHandler(this);
 
@@ -69,8 +74,9 @@ export class Client extends BaseClient {
     }
 
     // type 0 (text), 2 (voice), or 4 (category)
-    createChannel(guildID: Snowflake, name: string, type: number | ChannelTypes | string, options?: CreateChannelOptions): Promise<any> {
-        if (typeof type === "string") type = ChannelTypes[type as string];
+    createChannel(guildID: Snowflake, name: string, type: number | ChannelType | string, options?: CreateChannelOptions): Promise<any> {
+        if (typeof type === "string") type = ChannelType[type as string];
+        if (type === 13 && !(this.guilds.resolve(guildID)?.features?.includes("COMMUNITY") ?? true)) throw Error("Can not create stage channel in non-community guild");
         return this.requestHandler.request("POST", Endpoints.GUILD_CHANNELS(guildID), true, {
             name,
             type,
@@ -212,7 +218,7 @@ export class Client extends BaseClient {
     }
 
     getRESTGuild(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD(guildID), true);
     }
 
     getRESTGuildChannels(guildID: Snowflake): Promise<any> {
@@ -290,7 +296,7 @@ export class Client extends BaseClient {
     */
 
     getDMChannel(userID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.USER_CHANNELS("@me"), true, { recipient_id: userID });
     }
 
     getRESTUser(userID: Snowflake): Promise<any> {
@@ -420,7 +426,7 @@ export class Client extends BaseClient {
     }
 
     getRESTChannel(channelID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.CHANNEL(channelID), true);
     }
 
     getChannelInvites(channelID: Snowflake): Promise<any> {
