@@ -86,7 +86,7 @@ export interface ClientOptions {
     guildCache?: boolean,
     userCache?: boolean,
     channelCache?: boolean,
-    debug?: boolean,
+    logLevel?: string,
     concordiaEnabled?: boolean,
     concordiaHost?: string,
     concordiaPort?: number,

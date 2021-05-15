@@ -1,13 +1,18 @@
 
 import { ConcordiaClient } from "@developerdragon/concordiaclient";
+import { Logger } from "winston";
+import { ChannelManager } from "../managers/ChannelManager";
 import { GuildManager } from "../managers/GuildManager";
 import { PrivateChannelManager } from "../managers/PrivateChannelManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
+import { PrivateChannel } from "../structure/user/PrivateChannel";
 import { ChannelType, CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
 import { Endpoints } from "../util/Endpoints";
 import { WebsocketManager } from "../websocket/WebsocketManager";
+import { createLogger } from "../winston/patch";
+import { transport } from "../winston/transport";
 import { BaseClient, ClientOptions } from "./BaseClient";
 import { ClientLogger } from "./ClientLogger";
 import { ClientUser } from "./ClientUser";
@@ -16,6 +21,7 @@ export class Client extends BaseClient {
 
     ws: WebsocketManager;
 
+    channels: ChannelManager;
     guilds: GuildManager;
 
     privateChannels: PrivateChannelManager;
@@ -24,7 +30,7 @@ export class Client extends BaseClient {
 
     requestHandler: RequestHandler;
 
-    logger: ClientLogger;
+    logger: Logger;
 
     user: ClientUser;
 
@@ -35,15 +41,16 @@ export class Client extends BaseClient {
 
         this.ws = new WebsocketManager(this);
 
-        this.guilds = new GuildManager(this, undefined, { cache: options.guildCache });
+        this.channels = new ChannelManager(this, { cache: true });
+        this.guilds = new GuildManager(this, { cache: options.guildCache });
 
-        this.users = new UserManager(this, undefined, { cache: options.userCache });
+        this.users = new UserManager(this, { cache: options.userCache });
 
-        this.privateChannels = new PrivateChannelManager(this, undefined, { cache: true });
+        this.privateChannels = new PrivateChannelManager(this, { cache: true });
 
         this.requestHandler = new RequestHandler(this);
 
-        this.logger = new ClientLogger(this, this.options.debug);
+        this.logger = createLogger({ transports: transport(), level: this.options.logLevel });
 
         if (options.concordiaEnabled)
             this.concordiaClient = new ConcordiaClient({ host: options.concordiaHost, port: options.concordiaPort, token: options.concordiaToken });
@@ -295,8 +302,12 @@ export class Client extends BaseClient {
         User methods
     */
 
-    getDMChannel(userID: Snowflake): Promise<any> {
-        return this.requestHandler.request("POST", Endpoints.USER_CHANNELS("@me"), true, { recipient_id: userID });
+    async getDMChannel(userID: Snowflake, cache = true): Promise<PrivateChannel> {
+        return this.privateChannels.add(
+            await this.requestHandler.request("POST", Endpoints.USER_CHANNELS("@me"), true, { recipient_id: userID }),
+            cache,
+            userID
+        );
     }
 
     getRESTUser(userID: Snowflake): Promise<any> {

@@ -22,7 +22,7 @@ export const DefaultOptions: ClientOptions = {
     retryLimit: 1,
     restTimeOffset: 500,
     restSweepInterval: 60,
-    debug: false,
+    logLevel: "info",
     concordiaEnabled: true,
     concordiaHost: process.env.CONCORDIA_HOST || undefined,
     concordiaPort: parseInt(process.env.CONCORDIA_PORT) || undefined
