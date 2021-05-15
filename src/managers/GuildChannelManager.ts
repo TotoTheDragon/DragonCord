@@ -14,6 +14,10 @@ export class GuildChannelManager extends BaseManager<GuildChannel> implements Pa
         this.guild = guild;
     }
 
+    get cache() {
+        return this._cache;
+    }
+
     get(id: string, opts?: PartialCreateOptions): Partial {
         return this._cache.get(id) as GuildChannel || this.createPartial(id, opts);
     }
