@@ -98,11 +98,11 @@ export class Guild extends Base implements Partial {
     }
 
     async fetch(opts?: FetchOptions): Promise<Guild> {
-        const guild_data = await this._client.getRESTGuild(this.id);
+        const guildData = await this._client.getRESTGuild(this.id);
         if (opts?.cache === false)
-            return this._clone()._deserialize(guild_data);
+            return this._clone()._deserialize(guildData);
         else
-            this._deserialize(guild_data);
+            this._deserialize(guildData);
         return this;
     }
 

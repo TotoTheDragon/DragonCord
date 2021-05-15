@@ -40,11 +40,11 @@ export class User extends Base implements Partial {
     }
 
     async fetch(opts?: FetchOptions): Promise<User> {
-        const guild_data = await this._client.getRESTUser(this.id);
+        const userData = await this._client.getRESTUser(this.id);
         if (opts?.cache === false)
-            return this._clone()._deserialize(guild_data);
+            return this._clone()._deserialize(userData);
         else
-            this._deserialize(guild_data);
+            this._deserialize(userData);
         return this;
     }
 
