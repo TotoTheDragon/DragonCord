@@ -7,9 +7,10 @@ import { Base } from "./Base";
 import { Channel } from "./Channel";
 import { Guild } from "./guild/Guild";
 import { TextBasedChannel } from "./interfaces/TextBasedChannel";
+import { FetchOptions, Partial } from "./Partial";
 import { User } from "./user/User";
 
-export class Message extends Base {
+export class Message extends Base implements Partial {
 
     id: string; // The snowflake of this message
 
@@ -78,6 +79,15 @@ export class Message extends Base {
 
     get partial(): boolean {
         return typeof this.content !== 'string' || !this.author;
+    }
+
+    async fetch(opts?: FetchOptions): Promise<Message> {
+        const messageData = this._client.getMessage(this.channelID, this.id);
+        if (opts?.cache === false)
+            return this._clone()._deserialize(messageData);
+        else
+            this._deserialize(messageData);
+        return this;
     }
 
     _deserialize(data: any) {
