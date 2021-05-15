@@ -11,6 +11,6 @@ export async function message_create(client: Client, { d: data }, shard: number)
             .get();
         message.guild.channels.add(await channelRequest.make());
     }
-    client.logger.emit("DEBUG", "MESSAGE", JSON.stringify(message.serialize()));
+    client.logger.silly("Event > MESSAGE", "event", "messageCreate", message.serialize());
     client.emit("message", message);
 }
