@@ -40,11 +40,12 @@ export class GuildChannelManager extends BaseManager<GuildChannel> implements Pa
 
     async fetch(): Promise<GuildChannel[]> {
         const guildChannels = await this._client.getRESTGuildChannels(this.guild.id);
-        for (const channel of guildChannels)
-            this._client.channels.add(channel)
-        for (const channel of this.cache.values()) {
-            console.log(`${channel instanceof GuildChannel} ${channel instanceof Channel}`)
-        }
+        if (this._client.options.guildCache === false)
+            for (const channel of guildChannels)
+                super.add(channel);
+        else
+            for (const channel of guildChannels)
+                this._client.channels.add(channel)
         return this.cache.values();
     }
 

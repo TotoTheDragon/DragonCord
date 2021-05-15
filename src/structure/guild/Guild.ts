@@ -53,7 +53,7 @@ export class Guild extends Base implements Partial {
     constructor(client: Client, data: any) {
         super(client);
 
-        this.channels = new GuildChannelManager(this, client, { cache: client.options.channelCache });
+        this.channels = new GuildChannelManager(this, client, { cache: true });
 
         this.deleted = false;
 

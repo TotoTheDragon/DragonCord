@@ -24,10 +24,10 @@ export class ChannelManager extends BaseManager<GuildChannel> implements Partial
     onAdd(channel: GuildChannel) {
         // Add to guildChannel map
         if (!this.guildChannels.has(channel.guildID)) this.guildChannels.set(channel.guildID, new Set());
-        this.guildChannels.get(channel.guildID).add(channel.id);
+        this.guildChannels.get(channel.guildID)?.add(channel.id);
 
         // Add to guilds channel manager
-        this._client.guilds.resolve(channel.guildID).channels.add(channel);
+        this._client.guilds.resolve(channel.guildID)?.channels.add(channel);
     }
 
     getChannels(guild: Snowflake): GuildChannel[] {
