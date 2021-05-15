@@ -3,8 +3,9 @@ import { GuildChannelManager } from "../../managers/GuildChannelManager";
 import { Snowflake } from "../../util/Constants";
 import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Base } from "../Base";
+import { FetchOptions, Partial } from "../Partial";
 
-export class Guild extends Base {
+export class Guild extends Base implements Partial {
 
     channels: GuildChannelManager;
 
@@ -52,7 +53,7 @@ export class Guild extends Base {
     constructor(client: Client, data: any) {
         super(client);
 
-        this.channels = new GuildChannelManager(this, client, undefined, { cache: client.options.channelCache });
+        this.channels = new GuildChannelManager(this, client, { cache: client.options.channelCache });
 
         this.deleted = false;
 
@@ -65,7 +66,7 @@ export class Guild extends Base {
             if (!data.channels) this.available = false;
         }
 
-        this.shardID = data.shardID || SnowflakeUtil.findShard(this.id, this.client.options.shardCount || 1);
+        this.shardID = data.shardID || SnowflakeUtil.findShard(this.id, this._client.options.shardCount || 1);
     }
 
     get createdTimestamp() {
@@ -96,6 +97,14 @@ export class Guild extends Base {
         return "";
     }
 
+    async fetch(opts?: FetchOptions): Promise<Guild> {
+        const guild_data = await this._client.getRESTGuild(this.id);
+        if (opts?.cache === false)
+            return this._clone()._deserialize(guild_data);
+        else
+            this._deserialize(guild_data);
+        return this;
+    }
 
     _deserialize(data: any) {
 
@@ -140,6 +149,8 @@ export class Guild extends Base {
 
         if (data.owner_id)
             this.ownerID = data.owner_id;
+
+        return this;
     }
 
     serialize(props: string[] = []): object {

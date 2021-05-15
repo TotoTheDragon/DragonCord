@@ -1,12 +1,21 @@
 import { Client } from "../client/Client";
 import { Guild } from "../structure/guild/Guild";
-import { ManagerOptions } from "../util/Constants";
+import { PartialCreateOptions, PartialManager } from "../structure/Partial";
+import { ManagerOptions, Snowflake } from "../util/Constants";
 import { BaseManager } from "./BaseManager";
 
-export class GuildManager extends BaseManager<Guild> {
+export class GuildManager extends BaseManager<Guild> implements PartialManager {
 
-    constructor(client: Client, iterable?: Iterable<Guild>, options?: ManagerOptions) {
-        super(client, Guild, iterable, options);
+    constructor(client: Client, options?: ManagerOptions) {
+        super(client, Guild, options);
+    }
+
+    get cache() {
+        return this._cache;
+    }
+
+    createPartial(id: Snowflake, opts?: PartialCreateOptions): Guild {
+        return this.add({ id }, opts?.cache);
     }
 
 }
