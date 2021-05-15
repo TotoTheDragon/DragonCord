@@ -6,14 +6,14 @@ import { Util } from "../util/Util";
 
 let Structures;
 
-export class BaseManager<T extends Base> {
+export abstract class BaseManager<T extends Base> {
 
-    private readonly _client: Client;
+    protected readonly _client: Client;
     private readonly _holds: any;
-    readonly cache: Cache<T>;
+    protected readonly _cache: Cache<T>;
     private readonly _options: ManagerOptions;
 
-    constructor(client: Client, holds: any, iterable?: Iterable<T>, options: ManagerOptions = {}) {
+    constructor(client: Client, holds: any, options: ManagerOptions = {}, iterable?: Iterable<T>) {
         this._client = client;
 
         if (!Structures) Structures = require("../util/Structures").Structures;
@@ -21,28 +21,36 @@ export class BaseManager<T extends Base> {
 
         this._options = Util.mergeDefault(DefaultManagerOptions, options);
 
-        this.cache = new Cache(this._options.cacheOptions); // Initialize cache
+        this._cache = new Cache(this._options.cacheOptions); // Initialize cache
 
-        if (iterable) for (const i of iterable) this.cache.add(i.valueOf(), i);
+        if (iterable)
+            for (const iter of iterable) this._cache.add(iter.valueOf(), iter);
     }
+
+    onAdd(object: T) { };
+    onUpdate(newObject: T) { };
 
     add(data: any, cache = true, ...extras: any): T {
         if (data === undefined || data === null) return null;
-        const existing = this.cache.get(data.id) as T;
-        if (existing && existing._update && cache && this._options.cache) existing._update(data);
+        const existing = this._cache.get(data.id) as T;
+        if (existing && existing._update && cache && this._options.cache) {
+            existing._update(data);
+            this.onUpdate(existing);
+        }
         if (existing) return existing;
         const value = new this._holds(this._client, data, ...extras);
-        if (cache && this._options.cache) this.cache.add(data.id, value);
+        if (cache && this._options.cache) this._cache.add(data.id, value);
+        this.onAdd(value);
         return value;
     }
 
     clearCache() {
-        this.cache.clear();
+        this._cache.clear();
     }
 
     resolve(idOrInstance: string | T): T {
         if (idOrInstance instanceof this._holds) return idOrInstance as T;
-        if (typeof idOrInstance === 'string') return this.cache.get(idOrInstance) as T || null;
+        if (typeof idOrInstance === 'string') return this._cache.get(idOrInstance) as T || null;
         return null;
     }
 
@@ -53,6 +61,6 @@ export class BaseManager<T extends Base> {
     }
 
     valueOf() {
-        return this.cache;
+        return this._cache;
     }
 }
