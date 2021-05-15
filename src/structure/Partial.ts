@@ -15,6 +15,7 @@ export interface FetchOptions {
     Manager
 */
 export interface PartialManager {
+    get(id: Snowflake, opts?: PartialCreateOptions): Partial;
     createPartial(id: Snowflake, opts?: PartialCreateOptions, data?: any): Partial;
 }
 

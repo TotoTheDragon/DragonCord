@@ -14,6 +14,10 @@ export class GuildManager extends BaseManager<Guild> implements PartialManager {
         return this._cache;
     }
 
+    get(id: Snowflake, opts?: PartialCreateOptions): Guild {
+        return this._cache.get(id) as Guild || this.createPartial(id, opts);
+    }
+
     createPartial(id: Snowflake, opts?: PartialCreateOptions): Guild {
         return this.add({ id }, opts?.cache);
     }

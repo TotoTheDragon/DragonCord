@@ -3,8 +3,9 @@ import { ChannelType, Snowflake } from "../util/Constants";
 import { SnowflakeUtil } from "../util/SnowflakeUtil";
 import { Base } from "./Base";
 import { TextBasedChannel } from "./interfaces/TextBasedChannel";
+import { Partial } from "./Partial";
 
-export class Channel extends Base {
+export class Channel extends Base implements Partial {
 
     id: Snowflake;
 

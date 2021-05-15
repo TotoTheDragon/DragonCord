@@ -1,15 +1,24 @@
 import { Client } from "../client/Client";
 import { GuildChannel } from "../structure/guild/GuildChannel";
+import { Partial, PartialCreateOptions, PartialManager } from "../structure/Partial";
 import { ManagerOptions, Snowflake } from "../util/Constants";
 import { BaseManager } from "./BaseManager";
 
-export class ChannelManager extends BaseManager<GuildChannel> {
+export class ChannelManager extends BaseManager<GuildChannel> implements PartialManager {
 
     guildChannels: Map<Snowflake, Set<Snowflake>>; // Guild, Channel[]
 
     constructor(client: Client, options?: ManagerOptions) {
         super(client, GuildChannel, options);
         this.guildChannels = new Map();
+    }
+
+    get(id: string, opts?: PartialCreateOptions): Partial {
+        return this.createPartial(id, opts);
+    }
+
+    createPartial(id: string, opts?: PartialCreateOptions, data?: any): Partial {
+        return this.add({ ...data, id }, opts?.cache);
     }
 
     onAdd(channel: GuildChannel) {
