@@ -5,9 +5,8 @@ export function ready(client: Client, { d: data }, shard: number) {
     if (data.guilds)
         for (const guild of data.guilds)
             client.guilds.add(guild);
-
     client.user = new ClientUser(client, data.user);
-
     client.ws.session = data.session_id;
-    client.emit("ready");
+    client.logger.debug("Event > READY", "event", "ready", { shard })
+    client.emit("ready", shard);
 }
