@@ -41,4 +41,12 @@ export class GuildChannel extends TextBasedChannel {
         if ('parent_id' in data)
             this.categoryID = data.parent_id;
     }
+
+    serialize(props: string[] = []): object {
+        return super.serialize([
+            "name",
+            "categoryID",
+            ...props
+        ])
+    }
 }

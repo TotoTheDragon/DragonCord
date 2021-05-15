@@ -51,6 +51,7 @@ export class Channel extends Base implements Partial {
     serialize(props: string[] = []): object {
         return super.serialize([
             "createdTimestamp",
+            "type",
             ...props
         ])
     }
