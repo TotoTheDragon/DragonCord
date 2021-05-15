@@ -1,20 +1,29 @@
-import { APIRequest } from "../../rest/APIRequest";
-import { requestBuilder } from "../../rest/RequestBuilder";
+import { ChannelType, DiscordMessageContent } from "../../util/Constants";
+import { DCFile } from "../../util/DCFile";
 import { Channel } from "../Channel";
 import { MessageEmbed } from "../MessageEmbed";
+import { PrivateChannel } from "../user/PrivateChannel";
 
-export class TextBasedChannel extends Channel {
+export abstract class TextBasedChannel extends Channel {
 
-    async send(...data: any[]) {
-        const request: APIRequest = requestBuilder(this.client)
-            .channels(this.id)
-            .messages
-            .post();
+    async send(message: string | DiscordMessageContent | MessageEmbed): Promise<any> {
+        return this.sendItems(message)[0];
+    }
 
-        const content = data.filter(d => typeof d === "string").join(" ");
+    async sendItems(...data: any[]): Promise<any[]> {
 
-        const embed = (data.find(d => d instanceof MessageEmbed) as MessageEmbed)?.toJSON();
+        if (!this.id && this.type === ChannelType.DM && (this as unknown as PrivateChannel)._recipients?.length) this.id = (await this._client.getDMChannel((this as unknown as PrivateChannel)._recipients[0].id)).id;
 
-        return request.setBody({ content: content, embed: embed }).make();
+        if (!this.id) throw Error("Trying to send message to channel without providing id")
+
+        const content: string = data.filter(d => typeof d === "string").join(" ");
+
+        const embed: MessageEmbed = data.find(d => d instanceof MessageEmbed);
+
+        const files = data.filter(d => d instanceof DCFile);
+
+        data.filter(d => d instanceof Buffer).forEach(buf => files.push(new DCFile(buf)));
+
+        return this._client.createMessage(this.id, { content: content, embed: embed }, files);
     }
 }

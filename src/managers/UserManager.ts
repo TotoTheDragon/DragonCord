@@ -5,8 +5,8 @@ import { BaseManager } from "./BaseManager";
 
 export class UserManager extends BaseManager<User> {
 
-    constructor(client: Client, iterable?: Iterable<User>, options?: ManagerOptions) {
-        super(client, User, iterable, options);
+    constructor(client: Client, options?: ManagerOptions) {
+        super(client, User, options);
     }
 
 }

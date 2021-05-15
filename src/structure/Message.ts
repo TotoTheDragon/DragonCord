@@ -1,11 +1,12 @@
 import { Collection } from "@developerdragon/dragoncordapi";
 import { Client } from "../client/Client";
-import { MessageReference, MessageTypes, Snowflake } from "../util/Constants";
+import { ChannelType, MessageReference, MessageTypes, Snowflake } from "../util/Constants";
 import { SnowflakeUtil } from "../util/SnowflakeUtil";
+import { Util } from "../util/Util";
 import { Base } from "./Base";
 import { Channel } from "./Channel";
 import { Guild } from "./guild/Guild";
-import { GuildChannel } from "./guild/GuildChannel";
+import { TextBasedChannel } from "./interfaces/TextBasedChannel";
 import { User } from "./user/User";
 
 export class Message extends Base {
@@ -66,11 +67,13 @@ export class Message extends Base {
     }
 
     get guild(): Guild {
-        return this.isGuild ? this.client.guilds.resolve(this.guildID) || this.client.guilds.add({ id: this.guildID }) : null;
+        return this.isGuild ? this._client.guilds.resolve(this.guildID) || this._client.guilds.add({ id: this.guildID }) : null;
     }
 
-    get channel(): GuildChannel {
-        return this.guild ? this.guild.channels.resolve(this.channelID) || this.guild.channels.add({ id: this.channelID }) : null;
+    get channel(): TextBasedChannel {
+        return this.isDM
+            ? this._client.privateChannels.get(this.channelID, this.author.id)
+            : new Channel(this._client, { id: this.channelID, type: ChannelType.TEXT }) as TextBasedChannel
     }
 
     get partial(): boolean {
@@ -81,7 +84,7 @@ export class Message extends Base {
 
         this.id = data.id;
 
-        if ('author' in data) this.author = this.client.users.add(data.author);
+        if ('author' in data) this.author = this._client.users.add(data.author);
         else if (!this.author) this.author = null;
 
         if ('type' in data) {
@@ -106,8 +109,8 @@ export class Message extends Base {
         this.embeds = data.embeds || []; // TODO Change this to turn into embed objects
 
         this.attachments = new Collection();
-        if (data.attachments && data.attachments.length > 0)
-            for (const attachment of data.attachment)
+        if ('attachments' in data)
+            for (const attachment of Util.toArray(data.attachments))
                 this.attachments.set(attachment.id, attachment);
 
         if (data.reactions && data.reactions.length > 0)
@@ -120,7 +123,7 @@ export class Message extends Base {
         if (this.member && data.member)
             this.member._deserialize(data.member);
         else if (data.member && this.guild && this.author)
-            this.member = new Base(this.client);
+            this.member = new Base(this._client);
 
         this.reference = data.message_reference ? { channelID: data.message_reference.channel_id, guildID: data.message_reference.guild_id, messageID: data.message_reference.message_id } : null;
 
@@ -129,7 +132,7 @@ export class Message extends Base {
     _update(data: any) {
         const clone: Message = this._clone();
 
-        if ('author' in data) this.author = this.client.users.add(data.author);
+        if ('author' in data) this.author = this._client.users.add(data.author);
         else if (!this.author) this.author = null;
         if ('edited_timestamp' in data) this.editedTimestamp = new Date(data.edited_timestamp).getTime();
         if ('content' in data) this.content = data.content;
@@ -140,7 +143,7 @@ export class Message extends Base {
 
         if ('attachments' in data) {
             this.attachments = new Collection();
-            for (const attachment of data.attachments)
+            for (const attachment of Util.toArray(data.attachments))
                 this.attachments.set(attachment.id, attachment);
         }
 

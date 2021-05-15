@@ -1,26 +1,27 @@
 import { Client } from "../client/Client";
-import { ChannelTypes, Snowflake } from "../util/Constants";
+import { ChannelType, Snowflake } from "../util/Constants";
 import { SnowflakeUtil } from "../util/SnowflakeUtil";
 import { Base } from "./Base";
+import { TextBasedChannel } from "./interfaces/TextBasedChannel";
 
 export class Channel extends Base {
 
     id: Snowflake;
 
-    type: string;
+    type: ChannelType;
 
     deleted: boolean;
 
     constructor(client: Client, data: any) {
         super(client);
 
-        const type = ChannelTypes[data.type];
-
-        this.type = type ? type.toLowerCase() : 'unknown';
+        this.type = data.type ?? 0;
 
         this.deleted = false;
 
-        if (data) this._deserialize(data);
+        if (data != null) this._deserialize(data);
+
+        if (this.isTextBased && !(this instanceof TextBasedChannel)) Object.setPrototypeOf(this, TextBasedChannel.prototype);
     }
 
     get createdTimestamp(): number {
@@ -35,12 +36,15 @@ export class Channel extends Base {
         return `<#${this.id}>`;
     }
 
-    get isText(): boolean {
-        return 'messages' in this;
+    get isTextBased(): boolean {
+        return this.type === ChannelType.TEXT
+            || this.type === ChannelType.DM;
     }
 
     _deserialize(data: any) {
-        this.id = data.id;
+        if ('id' in data)
+            this.id = data.id;
+        super._deserialize(data);
     }
 
     serialize(props: string[] = []): object {
@@ -48,6 +52,12 @@ export class Channel extends Base {
             "createdTimestamp",
             ...props
         ])
+    }
+
+    async fetch(): Promise<Channel> {
+        const data = await this._client.getRESTChannel(this.id);
+        this._deserialize(data);
+        return this;
     }
 
 }

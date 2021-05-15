@@ -1,13 +1,12 @@
 import { Client } from "../../client/Client";
 import { CustomError } from "../../errors/CustomError";
-import { requestBuilder } from "../../rest/RequestBuilder";
 import { Snowflake, Urls } from "../../util/Constants";
 import { Endpoints } from "../../util/Endpoints";
 import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Util } from "../../util/Util";
 import { Base } from "../Base";
 import { Message } from "../Message";
-import { DMChannel } from "./DMChannel";
+import { PrivateChannel } from "./PrivateChannel";
 
 export class User extends Base {
 
@@ -24,7 +23,9 @@ export class User extends Base {
     system: boolean;
     flags: any;
 
-    private DMChannel: DMChannel;
+    channelID: Snowflake;
+
+    private DMChannel: PrivateChannel;
 
     constructor(client: Client, data: any) {
         super(client);
@@ -68,24 +69,19 @@ export class User extends Base {
     }
 
     get channel() {
-        if (this.DMChannel) return this.DMChannel;
-        return null;
+        return this._client.privateChannels.get(this.channelID, this.id);
     }
 
-    async createDM(): Promise<DMChannel> {
-        if (!this.DMChannel) this.DMChannel = await new DMChannel(this.client, await requestBuilder(this.client)
-            .users("@me")
-            .channels()
-            .post()
-            .setBody({ recipient_id: this.id })
-            .make(), this);
-        return this.DMChannel;
+    async createDM(): Promise<PrivateChannel> {
+        if (!this.channelID)
+            this.channelID = (await this._client.getDMChannel(this.id)).id;
+        return this.channel;
     }
 
-    async send(...content: any[]): Promise<Message> {
+    async send(...content: any[]): Promise<Message[]> {
         if (!this.DMChannel) await this.createDM();
         if (!this.DMChannel) throw new CustomError("DM_CHANNEL_ERROR", "Was not able to create a DM Channel");
-        return this.DMChannel.send(...content);
+        return this.DMChannel.sendItems(...content);
     }
 
     avatarURL({ format = 'webp', size = undefined, dynamic = true } = {}): string {

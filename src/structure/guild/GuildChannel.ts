@@ -1,11 +1,10 @@
 import { Client } from "../../client/Client";
 import { Snowflake } from "../../util/Constants";
 import { TextBasedChannel } from "../interfaces/TextBasedChannel";
-import { Guild } from "./Guild";
 
 export class GuildChannel extends TextBasedChannel {
 
-    guild: Guild;
+    guildID: Snowflake;
 
     name: string;
     position: number;
@@ -13,19 +12,33 @@ export class GuildChannel extends TextBasedChannel {
 
     constructor(client: Client, data: any) {
         super(client, data);
+    }
 
-        this.guild = client.guilds.resolve(data.guild_id);
+    get guild() {
+        return this._client.guilds.resolve(this.guildID);
     }
 
     get category() {
-        return null; // TODO Get the category channel from guild
+        return this._client.channels.resolve(this.categoryID);
     }
 
     _deserialize(data: any) {
         super._deserialize(data);
 
+        this.guildID = data.guild_id;
+
         this.name = data.name;
         this.position = data.position;
         this.categoryID = data.parent_id || null;
+    }
+
+    _update(data: any) {
+
+        if ('name' in data)
+            this.name = data.name;
+        if ('position' in data)
+            this.position = data.position;
+        if ('parent_id' in data)
+            this.categoryID = data.parent_id;
     }
 }
