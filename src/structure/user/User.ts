@@ -6,9 +6,10 @@ import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Util } from "../../util/Util";
 import { Base } from "../Base";
 import { Message } from "../Message";
+import { FetchOptions, Partial } from "../Partial";
 import { PrivateChannel } from "./PrivateChannel";
 
-export class User extends Base {
+export class User extends Base implements Partial {
 
     id: Snowflake;
 
@@ -36,6 +37,15 @@ export class User extends Base {
         this.flags = null;
 
         this._deserialize(data);
+    }
+
+    async fetch(opts?: FetchOptions): Promise<User> {
+        const guild_data = await this._client.getRESTUser(this.id);
+        if (opts?.cache === false)
+            return this._clone()._deserialize(guild_data);
+        else
+            this._deserialize(guild_data);
+        return this;
     }
 
     _update(data: any) {
