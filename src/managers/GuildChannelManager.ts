@@ -1,4 +1,5 @@
 import { Client } from "../client/Client";
+import { Channel } from "../structure/Channel";
 import { Guild } from "../structure/guild/Guild";
 import { GuildChannel } from "../structure/guild/GuildChannel";
 import { Partial, PartialCreateOptions, PartialManager } from "../structure/Partial";
@@ -7,7 +8,7 @@ import { BaseManager } from "./BaseManager";
 
 export class GuildChannelManager extends BaseManager<GuildChannel> implements PartialManager {
 
-    guild: Guild;
+    private readonly guild: Guild;
 
     constructor(guild: Guild, client: Client, options?: ManagerOptions) {
         super(client, GuildChannel, options, client.channels.getChannels(guild.id));
@@ -35,6 +36,16 @@ export class GuildChannelManager extends BaseManager<GuildChannel> implements Pa
 
     remove(channelID: Snowflake) {
         this._cache.remove(channelID);
+    }
+
+    async fetch(): Promise<GuildChannel[]> {
+        const guildChannels = await this._client.getRESTGuildChannels(this.guild.id);
+        for (const channel of guildChannels)
+            this._client.channels.add(channel)
+        for (const channel of this.cache.values()) {
+            console.log(`${channel instanceof GuildChannel} ${channel instanceof Channel}`)
+        }
+        return this.cache.values();
     }
 
 }

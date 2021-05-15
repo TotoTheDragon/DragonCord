@@ -229,7 +229,7 @@ export class Client extends BaseClient {
     }
 
     getRESTGuildChannels(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_CHANNELS(guildID), true);
     }
 
     getRESTGuildEmoji(guildID: Snowflake, emojiID: Snowflake): Promise<any> {
