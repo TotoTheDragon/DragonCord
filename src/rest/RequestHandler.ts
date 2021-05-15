@@ -23,7 +23,7 @@ export class RequestHandler extends Base {
     }
 
     async request(method: Method, url: string, auth: boolean, body?: any, file?: DCFile | DCFile[], _route?: string, prioritize?: boolean): Promise<object> {
-        this.client.logger.emit("DEBUG", "REQUEST", method, url, body ? JSON.stringify(body) || "" : "");
+        this._client.logger.silly("API Request", "api", "request", "outgoing", { method, url, body });
         const route = _route || this.routefy(url, method);
 
         const stack = new Error().stack.substring(7);
@@ -41,7 +41,7 @@ export class RequestHandler extends Base {
 
             try {
 
-                if (auth) headers["Authorization"] = `Bot ${this.client.options.token}`;
+                if (auth) headers["Authorization"] = `Bot ${this._client.options.token}`;
 
                 if (body && body.reason) headers["X-Audit-Log-Reason"] = body.reason;
                 if (body && body.reason && (method !== "POST" || !url.includes("/prune"))) delete body.reason;
