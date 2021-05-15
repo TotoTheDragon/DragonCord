@@ -2,10 +2,10 @@ import { Client } from "../client/Client";
 
 export class Base {
 
-    readonly client: Client;
+    readonly _client: Client;
 
     constructor(client: Client) {
-        this.client = client;
+        this._client = client;
     }
 
     /*
