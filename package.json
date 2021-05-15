@@ -9,16 +9,21 @@
   "author": "DeveloperDragon (me@developerdragon.com)",
   "license": "ISC",
   "dependencies": {
-    "@developerdragon/advancedcache": "^1.0.3",
+    "@developerdragon/advancedcache": "^1.0.4",
     "@developerdragon/concordiaclient": "^1.0.3",
     "@developerdragon/dragoncordapi": "^1.0.2",
-    "@types/ws": "^7.4.0",
+    "colors": "^1.4.0",
     "fs": "0.0.1-security",
     "https": "^1.0.0",
+    "winston": "^3.3.3",
     "ws": "^7.4.3",
     "zlib": "^1.0.5"
   },
   "devDependencies": {
+    "@types/colors": "^1.2.1",
+    "@types/triple-beam": "^1.3.2",
+    "@types/winston": "^2.4.4",
+    "@types/ws": "^7.4.1",
     "dotenv": "^8.2.0"
   }
 }
