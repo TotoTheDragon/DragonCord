@@ -1,8 +1,10 @@
 
 import { ConcordiaClient } from "@developerdragon/concordiaclient";
+import moment from "moment";
 import { Logger } from "winston";
 import { ChannelManager } from "../managers/ChannelManager";
 import { GuildManager } from "../managers/GuildManager";
+import { MessageManager } from "../managers/MessageManager";
 import { PrivateChannelManager } from "../managers/PrivateChannelManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
@@ -34,6 +36,8 @@ export class Client extends BaseClient {
 
     user: ClientUser;
 
+    messages: MessageManager;
+
     concordiaClient: ConcordiaClient;
 
     constructor(options: ClientOptions = {}) {
@@ -45,6 +49,15 @@ export class Client extends BaseClient {
         this.guilds = new GuildManager(this, { cache: options.guildCache });
 
         this.users = new UserManager(this, { cache: options.userCache });
+
+        this.messages = new MessageManager(this, {
+            cacheOptions: {
+                limit: this.options.messageCacheMaxSize,
+                cacheDuration: moment.duration(this.options.messageCacheLifetime),
+                autoClean: true,
+                autoCleanInterval: moment.duration(this.options.messageSweepInterval)
+            }
+        })
 
         this.privateChannels = new PrivateChannelManager(this, { cache: true });
 
