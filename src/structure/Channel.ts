@@ -56,6 +56,10 @@ export class Channel extends Base implements Partial {
         ])
     }
 
+    get partial(): boolean {
+        return true
+    }
+
     async fetch(): Promise<Channel> {
         const data = await this._client.getRESTChannel(this.id);
         this._deserialize(data);

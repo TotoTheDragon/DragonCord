@@ -4,6 +4,7 @@ import { Snowflake } from "../util/Constants";
     Base
 */
 export interface Partial {
+    partial: boolean;
     fetch(opts?: FetchOptions): Promise<Partial>;
 }
 

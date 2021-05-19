@@ -26,4 +26,8 @@ export class PrivateChannel extends TextBasedChannel {
         if (!this.id && this._recipients?.length) this.id = (await this._client.getDMChannel((this as unknown as PrivateChannel)._recipients[0].id)).id;
         return super.fetch();
     }
+
+    get partial(): boolean {
+        return this.recipientID != null && this.id != null;
+    }
 }
