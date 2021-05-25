@@ -1,9 +1,11 @@
-import { guild_create } from "./GUILD_CREATE";
-import { message_create } from "./MESSAGE_CREATE";
+import { guildCreate } from "./GUILD_CREATE";
+import { messageCreate } from "./MESSAGE_CREATE";
+import { messageUpdate } from "./MESSAGE_UPDATE";
 import { ready } from "./READY";
 
 export const handlers = {
     "READY": ready,
-    "MESSAGE_CREATE": message_create,
-    "GUILD_CREATE": guild_create
+    "MESSAGE_CREATE": messageCreate,
+    "MESSAGE_UPDATE": messageUpdate,
+    "GUILD_CREATE": guildCreate
 }
