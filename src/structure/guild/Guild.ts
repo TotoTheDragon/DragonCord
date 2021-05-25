@@ -106,6 +106,10 @@ export class Guild extends Base implements Partial {
         return this;
     }
 
+    get partial(): boolean {
+        return Boolean(this.name);
+    }
+
     _deserialize(data: any) {
 
         this.id = data.id;
