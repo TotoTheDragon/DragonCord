@@ -100,7 +100,7 @@ export class WebsocketManager extends EventEmitter {
         this.lastReceivedSequence = s ?? this.lastReceivedSequence ?? 0;
         switch (op) {
             case GatewayOPCodes.EVENT:
-                if (handlers[t]) handlers[t](this.client, request, this.client.options.shard);
+                if (handlers[t]) handlers[t](this.client, request.d);
                 else this.client.logger.debug("Unhandled websocket event", "websocket", "event", request);
                 break;
             case GatewayOPCodes.HELLO:
