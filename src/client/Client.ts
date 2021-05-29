@@ -72,7 +72,7 @@ export class Client extends BaseClient {
     async login(token?: string): Promise<void> {
         if (!this.options.token) this.options.token = token;
         await this.ws.connect();
-        this.ws.sendIdentify(this.options.token);
+        this.ws.sendIdentify(this.options.token, this.options.intents);
     }
 
     /*

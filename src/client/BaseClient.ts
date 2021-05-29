@@ -90,5 +90,6 @@ export interface ClientOptions {
     concordiaEnabled?: boolean,
     concordiaHost?: string,
     concordiaPort?: number,
-    concordiaToken?: string
+    concordiaToken?: string,
+    intents?: number
 }
