@@ -6,6 +6,7 @@ import { Util } from "../util/Util";
 import { Base } from "./Base";
 import { Channel } from "./Channel";
 import { Guild } from "./guild/Guild";
+import { ComponentHolder } from "./interaction/components/ComponentHolder";
 import { TextBasedChannel } from "./interfaces/TextBasedChannel";
 import { FetchOptions, Partial } from "./Partial";
 import { User } from "./user/User";
@@ -39,6 +40,8 @@ export class Message extends Base implements Partial {
     nonce: string;
 
     deleted: boolean;
+
+    components: ComponentHolder;
 
     constructor(client: Client, data: any) {
         super(client);
@@ -123,6 +126,8 @@ export class Message extends Base implements Partial {
             for (const attachment of Util.toArray(data.attachments))
                 this.attachments.set(attachment.id, attachment);
 
+        this.components = new ComponentHolder(this._client, data.components);
+
         if (data.reactions && data.reactions.length > 0)
             for (const reaction of data.reactions)
                 this.reactions.set(reaction.emoji.id, reaction);
@@ -157,6 +162,9 @@ export class Message extends Base implements Partial {
                 this.attachments.set(attachment.id, attachment);
         }
 
+        if ('components' in data)
+            this.components = new ComponentHolder(this._client, data.components);
+
         return clone;
     }
 
@@ -166,6 +174,7 @@ export class Message extends Base implements Partial {
             "channelID",
             "guildID",
             "author",
+            "components",
             ...props
         ])
     }
