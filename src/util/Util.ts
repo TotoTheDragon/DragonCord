@@ -1,4 +1,8 @@
+import { Client } from "../client/Client";
 import { CustomError } from "../errors/CustomError";
+import { ActionRow } from "../structure/interaction/components/ActionRow";
+import { Button } from "../structure/interaction/components/Button";
+import { MessageComponent } from "../structure/interaction/components/Component";
 import { Colors, ImageFormats, ImageSizes } from "./Constants";
 
 const has = (o, k) => Object.prototype.hasOwnProperty.call(o, k);
@@ -47,4 +51,9 @@ export class Util {
         return Array.isArray(input) ? input : Array.of(input);
     }
 
+    static createMessageComponent(client: Client, data: any): MessageComponent {
+        if (data.type === 1) return new ActionRow(client, data);
+        if (data.type === 2) return new Button(client, data);
+        return undefined;
+    }
 }

@@ -67,9 +67,11 @@ export class Endpoints {
     static WEBHOOK = (hook: string): string => `/webhooks/${hook}`;
     static WEBHOOK_SLACK = (hook: string): string => `/webhooks/${hook}/slack`;
     static WEBHOOK_TOKEN = (hook: string, hook_token: string): string => `/webhooks/${hook}/${hook_token}`;
-    static WEBHOOK_TOKEN_SLACK = (hook: string, hook_token: string): string => `/webhooks/${hook}/${hook_token}/slack`
+    static WEBHOOK_TOKEN_SLACK = (hook: string, hook_token: string): string => `/webhooks/${hook}/${hook_token}/slack`;
 
-
+    static INTERACTION_CALLBACK = (interaction: string, token: string) => `/interactions/${interaction}/${token}/callback`;
+    static INTERACTION_ORIGINAL = (application: string, token: string) => `/webhooks/${application}/${token}/messages/@original`;
+    static INTERACTION = (application: string, token: string) => `/webhooks/${application}/${token}`;
     /*
         Client Endpoints
     */
