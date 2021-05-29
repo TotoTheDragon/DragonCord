@@ -176,7 +176,7 @@ export class MetaFormat implements Format {
         const tags = [];
         const objects = [];
 
-        if (info[SPLAT]?.[0]._callee)
+        if (info[SPLAT]?.[0]?._callee)
             info[SPLAT].shift();
 
         if (typeof info[SPLAT]?.[Symbol.iterator] === 'function')
