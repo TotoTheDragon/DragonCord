@@ -1,5 +1,4 @@
 import { Client } from "../client/Client";
-import { Channel } from "../structure/Channel";
 import { Guild } from "../structure/guild/Guild";
 import { GuildChannel } from "../structure/guild/GuildChannel";
 import { Partial, PartialCreateOptions, PartialManager } from "../structure/Partial";
@@ -41,11 +40,10 @@ export class GuildChannelManager extends BaseManager<GuildChannel> implements Pa
     async fetch(): Promise<GuildChannel[]> {
         const guildChannels = await this._client.getRESTGuildChannels(this.guild.id);
         if (this._client.options.guildCache === false)
-            for (const channel of guildChannels)
-                super.add(channel);
+            return guildChannels.map(data => super.add(data));
         else
             for (const channel of guildChannels)
-                this._client.channels.add(channel)
+                this._client.channels.add(channel); // Add to global channel cache, which will add to cached guild
         return this.cache.values();
     }
 
