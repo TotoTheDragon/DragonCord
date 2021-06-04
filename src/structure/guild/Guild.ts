@@ -1,5 +1,6 @@
 import { Client } from "../../client/Client";
 import { GuildChannelManager } from "../../managers/GuildChannelManager";
+import { GuildMemberManager } from "../../managers/GuildMemberManager";
 import { Snowflake } from "../../util/Constants";
 import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Base } from "../Base";
@@ -8,6 +9,7 @@ import { FetchOptions, Partial } from "../Partial";
 export class Guild extends Base implements Partial {
 
     channels: GuildChannelManager;
+    members: GuildMemberManager;
 
     id: Snowflake;
 
@@ -53,8 +55,8 @@ export class Guild extends Base implements Partial {
     constructor(client: Client, data: any) {
         super(client);
 
-        this.channels = new GuildChannelManager(this, client, { cache: true });
-
+        this.channels = new GuildChannelManager(this, client);
+        this.members = new GuildMemberManager(this, client);
         this.deleted = false;
 
         if (!data) return;

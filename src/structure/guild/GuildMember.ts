@@ -34,4 +34,11 @@ export class GuildMember extends Base implements Partial {
         return this;
     }
 
+    _deserialize(data: any) {
+        this.id = data.user.id;
+        this.guildID = data.guild_id;
+        this.user = this._client.users.add(data.user);
+        this._roles = data.roles;
+    }
+
 }
