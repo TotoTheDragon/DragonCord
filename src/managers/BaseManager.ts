@@ -39,7 +39,7 @@ export abstract class BaseManager<T extends Base> {
         }
         if (existing) return existing;
         const value = new this._holds(this._client, data, ...extras);
-        if (cache && this._options.cache) this._cache.add(data.id, value);
+        if (cache && this._options.cache) this._cache.add(value.id, value);
         this.onAdd(value);
         return value;
     }
