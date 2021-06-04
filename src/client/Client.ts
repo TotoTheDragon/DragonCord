@@ -253,8 +253,8 @@ export class Client extends BaseClient {
         return
     }
 
-    getRESTGuildMembers(guildID: Snowflake, limit: number = 1, after?: Snowflake): Promise<any> {
-        return
+    getRESTGuildMembers(guildID: Snowflake, limit: number = 55, after?: Snowflake): Promise<any> {
+        return this.requestHandler.request("GET", Endpoints.GUILD_MEMBERS(guildID), true, { limit, after });
     }
 
     getRESTGuildRoles(guildID: Snowflake): Promise<any> {
