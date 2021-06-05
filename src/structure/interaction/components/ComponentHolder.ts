@@ -11,7 +11,8 @@ export class ComponentHolder extends Base {
     constructor(client: Client, data: Data) {
         super(client);
 
-        this._deserialize(data);
+        if (data)
+            this._deserialize(data);
     }
 
     getButtonByID(id: string): Button {

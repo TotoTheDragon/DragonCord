@@ -34,9 +34,9 @@ export class ChannelManager extends BaseManager<GuildChannel> implements Partial
         return Array.from(this.guildChannels.get(guild) ?? [], id => this.resolve(id));
     }
 
-    remove(channelID: Snowflake) {
+    removeChannel(channelID: Snowflake) {
         const channel = this.resolve(channelID);
-        channel?.guild?.channels?.remove(channelID);
+        channel?.guild?.channels?.removeChannel(channelID);
         this.guildChannels.get(channel?.guildID)?.delete(channelID);
         this._cache.remove(channelID);
     }

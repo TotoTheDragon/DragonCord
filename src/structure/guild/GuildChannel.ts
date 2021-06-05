@@ -10,16 +10,21 @@ export class GuildChannel extends TextBasedChannel {
     position: number;
     categoryID: Snowflake;
 
+    deleted: boolean;
+
     constructor(client: Client, data: any) {
         super(client, data);
+
+        this.deleted = false;
+
     }
 
     get guild() {
-        return this._client.guilds.resolve(this.guildID);
+        return this._client.guilds.get(this.guildID);
     }
 
     get category() {
-        return this._client.channels.resolve(this.categoryID);
+        return this._client.channels.get(this.categoryID);
     }
 
     _deserialize(data: any) {
@@ -27,25 +32,28 @@ export class GuildChannel extends TextBasedChannel {
 
         this.guildID = data.guild_id;
 
-        this.name = data.name;
-        this.position = data.position;
-        this.categoryID = data.parent_id || null;
+        this._update(data);
     }
 
     _update(data: any) {
-
         if ('name' in data)
             this.name = data.name;
+
         if ('position' in data)
             this.position = data.position;
+
         if ('parent_id' in data)
             this.categoryID = data.parent_id;
+
+        if ('deleted' in data)
+            this.deleted = data.deleted;
     }
 
     serialize(props: string[] = []): object {
         return super.serialize([
             "name",
             "categoryID",
+            "deleted",
             ...props
         ])
     }

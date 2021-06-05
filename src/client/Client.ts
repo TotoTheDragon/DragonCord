@@ -8,6 +8,8 @@ import { MessageManager } from "../managers/MessageManager";
 import { PrivateChannelManager } from "../managers/PrivateChannelManager";
 import { UserManager } from "../managers/UserManager";
 import { RequestHandler } from "../rest/RequestHandler";
+import { Guild } from "../structure/guild/Guild";
+import { GuildChannel } from "../structure/guild/GuildChannel";
 import { PrivateChannel } from "../structure/user/PrivateChannel";
 import { ChannelType, CreateChannelInviteOptions, CreateChannelOptions, CreateChannelWebhookOptions, CreateGuildEmojiOptions, CreateGuildOptions, CreateRoleOptions, DiscordEditMessageContent, DiscordMessageContent, EditBotUserOptions, EditChannelOptions, EditGuildIntegration, EditGuildMemberOptions, EditGuildOptions, PruneMembersOptions, Snowflake, StatusOptions, VoiceChannelOptions, WebhookOptions } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
@@ -16,7 +18,6 @@ import { WebsocketManager } from "../websocket/WebsocketManager";
 import { createLogger } from "../winston/patch";
 import { transport } from "../winston/transport";
 import { BaseClient, ClientOptions } from "./BaseClient";
-import { ClientLogger } from "./ClientLogger";
 import { ClientUser } from "./ClientUser";
 
 export class Client extends BaseClient {
@@ -144,27 +145,27 @@ export class Client extends BaseClient {
     }
 
     createRole(guildID: Snowflake, options: CreateRoleOptions): Promise<any> {
-        return
+        return this.requestHandler.request("PUT", Endpoints.GUILD_ROLES(guildID), true, options);
     }
 
     deleteGuild(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD(guildID), true);
     }
 
     deleteGuildEmoji(guildID: Snowflake, emojiID: Snowflake, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_EMOJI(guildID, emojiID), true, { reason });
     }
 
     deleteGuildIntegration(guildID: Snowflake, integrationID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_INTEGRATION(guildID, integrationID), true);
     }
 
     deleteInvite(inviteID: Snowflake, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.INVITE(inviteID), true, { reason });
     }
 
     deleteRole(guildID: Snowflake, roleID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_ROLE(guildID, roleID), true);
     }
 
     editGuild(guildID: Snowflake, options: EditGuildOptions): Promise<any> {
@@ -190,101 +191,138 @@ export class Client extends BaseClient {
     }
 
     editGuildEmoji(guildID: Snowflake, emojiID: Snowflake, options: CreateGuildEmojiOptions) {
-        return
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_EMOJI(guildID, emojiID), true, options);
     }
 
     editGuildIntegration(guildID: Snowflake, integrationID: Snowflake, options: EditGuildIntegration): Promise<any> {
-        return
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_INTEGRATION(guildID, integrationID), true, {
+            expire_behavior: options.expireBehavior,
+            expire_grace_period: options.expireGracePeriod,
+            enable_emoticons: options.enableEmoticons
+        });
     }
 
     editGuildMember(guildID: Snowflake, memberID: Snowflake, options: EditGuildMemberOptions): Promise<any> {
-        return
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_MEMBER(guildID, memberID), true, options);
     }
 
     editRole(guildID: Snowflake, roleID: Snowflake, options: CreateRoleOptions): Promise<any> {
-        return
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_ROLE(guildID, roleID), true, options);
     }
 
-    editRolePosition(guildID: Snowflake, roleID: Snowflake, position: number): Promise<any> {
-        return
+    async editRolePosition(guildID: Snowflake, roleID: Snowflake, position: number): Promise<any> {
+        if (guildID === roleID)
+            throw new Error("Cannot move @everyone role");
+        const guild: Guild = this.guilds.get(guildID);
+        if (guild.partial)
+            await guild.roles.fetch();
+
+        const role = guild.roles.get(roleID);
+        if (!role)
+            throw Error(`Unknown role ${roleID}`)
+
+        if (role.position === position)
+            return;
+
+
+        const min = Math.min(position, role.position);
+        const max = Math.max(position, role.position);
+        const roles = guild._roles.filter((role) => min <= role.position && role.position <= max && role.id !== roleID).sort((a, b) => a.position - b.position);
+        if (position > role.position)
+            roles.push(role);
+        else
+            roles.unshift(role);
+
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_ROLES(guildID), true, roles.map((role, index) => ({
+            id: role.id,
+            position: index + min
+        })));
     }
 
     getGuildAuditLogs(guildID: Snowflake, limit: number = 50, before?: Snowflake, type?: number): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_AUDIT_LOGS(guildID), true, { limit, before, type });
     }
 
     getGuildBan(guildID: Snowflake, userID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_BAN(guildID, userID), true);
     }
 
     getGuildBans(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_BANS(guildID), true);
     }
 
     getGuildIntegrations(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_INTEGRATIONS(guildID), true);
     }
 
     getGuildInvites(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_INVITES(guildID), true);
     }
 
     getGuildVanity(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_VANITY_URL(guildID), true);
     }
 
     pruneMembers(guildID: Snowflake, options: PruneMembersOptions): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.GUILD_PRUNE(guildID), true, {
+            compute_prune_count: options.computePruneCount,
+            include_roles: options.includeRoles,
+            days: options.days,
+            reason: options.reason
+        })
     }
 
     getRESTGuild(guildID: Snowflake): Promise<any> {
         return this.requestHandler.request("GET", Endpoints.GUILD(guildID), true);
     }
 
+    getRESTGuildEmoji(guildID: Snowflake, emojiID: Snowflake): Promise<any> {
+        return this.requestHandler.request("GET", Endpoints.GUILD_EMOJI(guildID, emojiID), true);
+    }
+
     getRESTGuildChannels(guildID: Snowflake): Promise<any> {
         return this.requestHandler.request("GET", Endpoints.GUILD_CHANNELS(guildID), true);
     }
 
-    getRESTGuildEmoji(guildID: Snowflake, emojiID: Snowflake): Promise<any> {
-        return
-    }
-
     getRESTGuildMember(guildID: Snowflake, memberID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_MEMBER(guildID, memberID), true);
     }
 
     getRESTGuildMembers(guildID: Snowflake, limit: number = 55, after?: Snowflake): Promise<any> {
         return this.requestHandler.request("GET", Endpoints.GUILD_MEMBERS(guildID), true, { limit, after });
     }
 
+    getRESTGuildRole(guildID: Snowflake, roleID: Snowflake): Promise<any> {
+        return this.requestHandler.request("GET", Endpoints.GUILD_ROLE(guildID, roleID), true);
+    }
+
     getRESTGuildRoles(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_ROLES(guildID), true);
     }
 
     getRESTGuilds(limit: number = 100, before?: Snowflake, after?: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILDS(), true, { limit, before, after });
     }
 
     kickGuildMember(guildID: Snowflake, memberID: Snowflake, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_MEMBER(guildID, memberID), true, { reason })
     }
 
     leaveGuild(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.USER_GUILD("@me", guildID), true);
     }
 
     removeGuildMemberRole(guildID: Snowflake, memberID: Snowflake, roleID: Snowflake, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_MEMBER_ROLE(guildID, memberID, roleID), true, { reason });
     }
 
     syncGuildIntegration(guildID: Snowflake, integrationID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.GUILD_INTEGRATION_SYNC(guildID, integrationID), true);
     }
 
     unbanGuildMember(guildID: Snowflake, memberID: Snowflake, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_BAN(guildID, memberID), true, { reason });
     }
-
 
 
     closeVoiceConnection(guildID: Snowflake) {
@@ -324,7 +362,7 @@ export class Client extends BaseClient {
     }
 
     getRESTUser(userID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.USER(userID), true);
     }
 
     /*
@@ -361,16 +399,16 @@ export class Client extends BaseClient {
         return this.requestHandler.request("DELETE", Endpoints.CHANNEL_MESSAGE(channelID, messageID), true, { reason });
     }
 
-    deleteMessages(channeLID: Snowflake, messageIDs: Snowflake[], reason: string): Promise<any> {
-        return
+    deleteMessages(channelID: Snowflake, messages: Snowflake[], reason: string): Promise<any> {
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_MESSAGES(channelID), true, { reason, messages });
     }
 
     publishMessage(channelID: Snowflake, messageID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.CHANNEL_CROSSPOST(channelID, messageID), true);
     }
 
     addMessageReaction(channelID: Snowflake, messageID: Snowflake, reaction: string): Promise<any> {
-        return
+        return this.requestHandler.request("PUT", Endpoints.CHANNEL_MESSAGE_REACTION(channelID, messageID, reaction), true);
     }
 
     editMessage(channelID: Snowflake, messageID: Snowflake, content: string | DiscordEditMessageContent): Promise<any> {
@@ -390,35 +428,35 @@ export class Client extends BaseClient {
     }
 
     getMessage(channelID: Snowflake, messageID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.CHANNEL_MESSAGE(channelID, messageID), true);
     }
 
     getMessageReaction(channelID: Snowflake, messageID: Snowflake, reaction: string, limit: number = 100, before?: Snowflake, after?: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.CHANNEL_MESSAGE_REACTION(channelID, messageID, reaction), true, { limit, before, after });
     }
 
-    getMessages(channelID: Snowflake, limit: number = 50, before?: Snowflake, after?: Snowflake, around?: Snowflake): Promise<any[]> {
-        return
+    getMessages(channelID: Snowflake, limit: number = 50, before?: Snowflake, after?: Snowflake, around?: Snowflake): Promise<any> {
+        return this.requestHandler.request("GET", Endpoints.CHANNEL_MESSAGES(channelID), true, { limit, before, after, around });
     }
 
     pinMessage(channelID: Snowflake, messageID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("PUT", Endpoints.CHANNEL_PIN(channelID, messageID), true);
     }
 
     unpinMessage(channelID: Snowflake, messageID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_PIN(channelID, messageID), true);
     }
 
     removeMessageReaction(channelID: Snowflake, messageID: Snowflake, reaction: string, userID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_MESSAGE_REACTION_USER(channelID, messageID, reaction, userID), true);
     }
 
     removeMessageReactionEmoji(channelID: Snowflake, messageID: Snowflake, reaction: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_MESSAGE_REACTION(channelID, messageID, reaction), true);
     }
 
     removeMessageReactions(channelID: Snowflake, messageID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_MESSAGE_REACTIONS(channelID, messageID), true);
     }
 
     /*
@@ -430,23 +468,48 @@ export class Client extends BaseClient {
     }
 
     deleteChannelPermission(channelID: Snowflake, overwriteID: Snowflake, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.CHANNEL_PERMISSION(channelID, overwriteID), true, { reason });
     }
 
-    editChannel(channeLID: Snowflake, options: EditChannelOptions): Promise<any> {
-        return
+    editChannel(channelID: Snowflake, options: EditChannelOptions): Promise<any> {
+        return this.requestHandler.request("PATCH", Endpoints.CHANNEL(channelID), true, options);
     }
 
     editChannelPermission(channelID: Snowflake, overwriteID: Snowflake, allow: number, deny: number, type: "member" | "role", reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("PATCH", Endpoints.CHANNEL_PERMISSION(channelID, overwriteID), true, { allow, deny, type, reason });
     }
 
-    editChannelPosition(channeLID: Snowflake, position: number): Promise<any> {
-        return
+    async editChannelPosition(channeLID: Snowflake, position: number, options: any): Promise<any> {
+        const channel: GuildChannel = this.channels.get(channeLID);
+        if (!channel)
+            throw Error(`Unknown channel ${channeLID}`)
+
+        const guild: Guild = channel.guild;
+        if (guild.partial)
+            await guild.fetch();
+
+        if (channel.position === position)
+            return;
+
+
+        const min = Math.min(position, channel.position);
+        const max = Math.max(position, channel.position);
+        const channels = guild.channels.cache.values().filter((channel) => min <= channel.position && channel.position <= max && channel.id !== channeLID).sort((a, b) => a.position - b.position);
+        if (position > channel.position)
+            channels.push(channel);
+        else
+            channels.unshift(channel);
+
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_CHANNELS(guild.id), true, channels.map((role, index) => ({
+            id: role.id,
+            position: index + min,
+            lock_permissions: options.lockPermissions,
+            parent_id: options.parentID
+        })));
     }
 
     followChannel(channelID: Snowflake, targetChannelID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.CHANNEL_FOLLOW(channelID), true, { webhook_channel_id: targetChannelID });
     }
 
     getRESTChannel(channelID: Snowflake): Promise<any> {
@@ -454,47 +517,57 @@ export class Client extends BaseClient {
     }
 
     getChannelInvites(channelID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.CHANNEL_INVITES(channelID), true);
     }
 
     getPins(channelID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.CHANNEL_PINS(channelID), true);
     }
 
     sendChannelTyping(channelID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("POST", Endpoints.CHANNEL_TYPING(channelID), true);
     }
 
     /*
         Webhook methods
     */
 
-    createChannelWebhook(channelID: Snowflake, options?: CreateChannelWebhookOptions): Promise<any> {
-        return
+    createWebhook(channelID: Snowflake, options?: CreateChannelWebhookOptions): Promise<any> {
+        return this.requestHandler.request("POST", Endpoints.CHANNEL_WEBHOOKS(channelID), true, options);
     }
 
     deleteWebhook(webhookID: Snowflake, token: string, reason?: string): Promise<any> {
-        return
+        return this.requestHandler.request("DELETE", Endpoints.WEBHOOK_TOKEN(webhookID, token), false, { reason });
     }
 
-    editChannelWebhook(webhookID: Snowflake, token: string, options: CreateChannelWebhookOptions): Promise<any> {
-        return
+    editWebhook(webhookID: Snowflake, token: string, options: CreateChannelWebhookOptions): Promise<any> {
+        return this.requestHandler.request("PATCH", Endpoints.WEBHOOK_TOKEN(webhookID, token), false, options);
     }
 
     executeWebhook(webhookID: Snowflake, token: string, options: WebhookOptions): Promise<any> {
-        return
+        if (!options.content && !options.file && !options.embeds) {
+            return Promise.reject(new Error("No content, file, or embeds"));
+        }
+        return this.requestHandler.request("POST", Endpoints.WEBHOOK_TOKEN(webhookID, token) + (options.wait ? "?wait=true" : ""), !!options.auth, {
+            content: options.content,
+            embeds: options.embeds,
+            username: options.username,
+            avatar_url: options.avatarURL,
+            tts: options.tts,
+            allowed_mentions: this._formatAllowedMentions(options.allowedMentions)
+        }, options.file);
     }
 
     getChannelWebhooks(channelID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.CHANNEL_WEBHOOKS(channelID), true);
     }
 
     getGuildWebhooks(guildID: Snowflake): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.GUILD_WEBHOOKS(guildID), true);
     }
 
     getWebhook(webhookID: Snowflake, token: string): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.WEBHOOK_TOKEN(webhookID, token), true);
     }
 
     joinVoiceChannel(channelID: Snowflake, options?: VoiceChannelOptions): Promise<any> {
@@ -506,22 +579,161 @@ export class Client extends BaseClient {
     }
 
     /*
+        Interactions
+    */
+
+    getGlobalCommands(applicationID: Snowflake) {
+        return this.requestHandler.request("GET", Endpoints.APPLICATION_COMMANDS(applicationID), true);
+    }
+
+    overwriteGlobalCommands(applicationID: Snowflake, commands: any[]) {
+        return this.requestHandler.request("PATCH", Endpoints.APPLICATION_COMMANDS(applicationID), true, commands);
+    }
+
+    createGlobalCommand(applicationID: Snowflake, options: any) {
+        return this.requestHandler.request("GET", Endpoints.APPLICATION_COMMANDS(applicationID), true, {
+            name: options.name,
+            description: options.description,
+            options: options.options,
+            default_permission: options.defaultPermission
+        });
+    }
+
+    getGlobalCommand(applicationID: Snowflake, commandID: Snowflake) {
+        return this.requestHandler.request("GET", Endpoints.APPLICATION_COMMAND(applicationID, commandID), true);
+    }
+
+    editGlobalCommand(applicationID: Snowflake, commandID: Snowflake, options: any) {
+        return this.requestHandler.request("GET", Endpoints.APPLICATION_COMMAND(applicationID, commandID), true, {
+            name: options.name,
+            description: options.description,
+            options: options.options,
+            default_permission: options.defaultPermission
+        });
+    }
+
+    deleteGlobalCommand(applicationID: Snowflake, commandID: Snowflake) {
+        return this.requestHandler.request("DELETE", Endpoints.APPLICATION_COMMAND(applicationID, commandID), true);
+    }
+
+
+    getGuildCommands(applicationID: Snowflake, guildID: Snowflake) {
+        return this.requestHandler.request("GET", Endpoints.GUILD_COMMANDS(applicationID, guildID), true);
+    }
+
+    overwriteGuildCommands(applicationID: Snowflake, guildID: Snowflake, commands: any[]) {
+        return this.requestHandler.request("PATCH", Endpoints.GUILD_COMMANDS(applicationID, guildID), true, commands);
+    }
+
+    createGuildCommand(applicationID: Snowflake, guildID: Snowflake, options: any) {
+        return this.requestHandler.request("GET", Endpoints.GUILD_COMMANDS(applicationID, guildID), true, {
+            name: options.name,
+            description: options.description,
+            options: options.options,
+            default_permission: options.defaultPermission
+        });
+    }
+
+    getGuildCommand(applicationID: Snowflake, guildID: Snowflake, commandID: Snowflake) {
+        return this.requestHandler.request("GET", Endpoints.GUILD_COMMAND(applicationID, guildID, commandID), true);
+    }
+
+    editGuildCommand(applicationID: Snowflake, guildID: Snowflake, commandID: Snowflake, options: any) {
+        return this.requestHandler.request("GET", Endpoints.GUILD_COMMAND(applicationID, guildID, commandID), true, {
+            name: options.name,
+            description: options.description,
+            options: options.options,
+            default_permission: options.defaultPermission
+        });
+    }
+
+    deleteGuildCommand(applicationID: Snowflake, guildID: Snowflake, commandID: Snowflake) {
+        return this.requestHandler.request("DELETE", Endpoints.GUILD_COMMAND(applicationID, guildID, commandID), true);
+    }
+
+    createResponse(interactionID: Snowflake, token: string, response: any) {
+        return this.requestHandler.request("POST", Endpoints.INTERACTION_CALLBACK(interactionID, token), false, response);
+    }
+
+    getOriginalResponse(interactionID: Snowflake, token: string) {
+        return this.requestHandler.request("GET", Endpoints.INTERACTION_ORIGINAL(interactionID, token), false);
+    }
+
+    editOriginalResponse(interactionID: Snowflake, token: string, response: any) {
+        return this.requestHandler.request("PATCH", Endpoints.INTERACTION_ORIGINAL(interactionID, token), false, response);
+    }
+
+    deleteOriginalResponse(interactionID: Snowflake, token: string) {
+        return this.requestHandler.request("DELETE", Endpoints.INTERACTION_ORIGINAL(interactionID, token), false);
+    }
+
+    createFollowup(interactionID: Snowflake, token: string, options: WebhookOptions) {
+        if (!options.content && !options.file && !options.embeds) {
+            return Promise.reject(new Error("No content, file, or embeds"));
+        }
+        return this.requestHandler.request("POST", Endpoints.INTERACTION(interactionID, token), false, {
+            content: options.content,
+            embeds: options.embeds,
+            username: options.username,
+            avatar_url: options.avatarURL,
+            tts: options.tts,
+            allowed_mentions: this._formatAllowedMentions(options.allowedMentions)
+        }, options.file);
+    }
+
+    editFollowup(interactionID: Snowflake, token: string, messageID: Snowflake, options: WebhookOptions) {
+        if (!options.content && !options.file && !options.embeds) {
+            return Promise.reject(new Error("No content, file, or embeds"));
+        }
+        return this.requestHandler.request("PATCH", Endpoints.INTERACTION_MESSAGES(interactionID, token, messageID), false, {
+            content: options.content,
+            embeds: options.embeds,
+            username: options.username,
+            avatar_url: options.avatarURL,
+            tts: options.tts,
+            allowed_mentions: this._formatAllowedMentions(options.allowedMentions)
+        }, options.file);
+    }
+
+    deleteFollowup(interactionID: Snowflake, token: string, messageID: Snowflake) {
+        return this.requestHandler.request("DELETE", Endpoints.INTERACTION_MESSAGES(interactionID, token, messageID), false);
+    }
+
+    getCommandsPermissions(applicationID: Snowflake, guildID: Snowflake) {
+        return this.requestHandler.request("GET", Endpoints.GUILD_COMMANDS_PERMISSIONS(applicationID, guildID), true);
+    }
+
+    getCommandPermissions(applicationID: Snowflake, guildID: Snowflake, commandID: Snowflake) {
+        return this.requestHandler.request("GET", Endpoints.GUILD_COMMAND_PERMISSIONS(applicationID, guildID, commandID), true);
+    }
+
+    editCommandPermissions(applicationID: Snowflake, guildID: Snowflake, commandID: Snowflake, permissions: any[]) {
+        return this.requestHandler.request("PUT", Endpoints.GUILD_COMMAND_PERMISSIONS(applicationID, guildID, commandID), true, { permissions })
+    }
+
+    editCommandsPermissions(applicationID: Snowflake, guildID: Snowflake, options: any[]) {
+        return this.requestHandler.request("PUT", Endpoints.GUILD_COMMANDS_PERMISSIONS(applicationID, guildID), true, options)
+    }
+
+    /*
         Miscellaneous methods
     */
 
     getInvite(inviteID: Snowflake, withCounts?: boolean): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.INVITE(inviteID), true, {
+            with_counts: withCounts
+        });
     }
 
     getBotGateway(): Promise<any> {
-        if (!this.options.token.startsWith("Bot ")) {
+        if (!this.options.token.startsWith("Bot "))
             this.options.token = "Bot " + this.options.token;
-        }
+
         return this.requestHandler.request("GET", Endpoints.GATEWAY_BOT(), true);
     }
 
     getSelf(): Promise<any> {
-        return
+        return this.requestHandler.request("GET", Endpoints.USER("@me"), true);
     }
 
     _formatAllowedMentions(allowed) {

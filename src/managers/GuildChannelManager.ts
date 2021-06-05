@@ -33,7 +33,7 @@ export class GuildChannelManager extends BaseManager<GuildChannel> implements Pa
         return channel;
     }
 
-    remove(channelID: Snowflake) {
+    removeChannel(channelID: Snowflake) {
         this._cache.remove(channelID);
     }
 

@@ -10,7 +10,7 @@
             "ESNext.Symbol",
             "DOM"
         ],
-        "outDir": "dist",
+        "outDir": "lib",
         "strict": false,
         "strictFunctionTypes": false,
         "skipLibCheck": true,

@@ -116,9 +116,137 @@ export enum Colors {
     NOT_QUITE_BLACK = 0x23272a,
 };
 
+export const Permission: IPermission = {
+    CREATE_INSTANT_INVITE: 1n << 0n,
+    KICK_MEMBERS: 1n << 1n,
+    BAN_MEMBERS: 1n << 2n,
+    ADMINISTRATOR: 1n << 3n,
+    MANAGE_CHANNELS: 1n << 4n,
+    MANAGE_GUILD: 1n << 5n,
+    ADD_REACTIONS: 1n << 6n,
+    VIEW_AUDIT_LOG: 1n << 7n,
+    PRIORITY_SPEAKER: 1n << 8n,
+    STREAM: 1n << 9n,
+    VIEW_CHANNEL: 1n << 10n,
+    SEND_MESSAGES: 1n << 11n,
+    SEND_TTS_MESSAGES: 1n << 12n,
+    MANAGE_MESSAGES: 1n << 13n,
+    EMBED_LINKS: 1n << 14n,
+    ATTACH_FILES: 1n << 15n,
+    READ_MESSAGE_HISTORY: 1n << 16n,
+    MENTION_EVERYONE: 1n << 17n,
+    USE_EXTERNAL_EMOJIS: 1n << 18n,
+    VIEW_GUILD_INSIGHTS: 1n << 19n,
+    CONNECT: 1n << 20n,
+    SPEAK: 1n << 21n,
+    MUTE_MEMBERS: 1n << 22n,
+    DEAFEN_MEMBERS: 1n << 23n,
+    MOVE_MEMBERS: 1n << 24n,
+    USE_VAD: 1n << 25n,
+    CHANGE_NICKNAME: 1n << 26n,
+    MANAGE_NICKNAMES: 1n << 27n,
+    MANAGE_ROLES: 1n << 28n,
+    MANAGE_WEBHOOKS: 1n << 29n,
+    MANAGE_EMOJIS: 1n << 30n,
+    USE_SLASH_COMMANDS: 1n << 31n,
+    REQUEST_TO_SPEAK: 1n << 32n,
+    MANAGE_THREADS: 1n << 34n,
+    USE_PUBLIC_THREADS: 1n << 35n,
+    USE_PRIVATE_THREADS: 1n << 36n
+}
+
+Permission.ALL_GUILD = Permission.KICK_MEMBERS
+    | Permission.BAN_MEMBERS
+    | Permission.ADMINISTRATOR
+    | Permission.MANAGE_CHANNELS
+    | Permission.MANAGE_GUILD
+    | Permission.VIEW_AUDIT_LOG
+    | Permission.VIEW_GUILD_INSIGHTS
+    | Permission.CHANGE_NICKNAME
+    | Permission.MANAGE_NICKNAMES
+    | Permission.MANAGE_ROLES
+    | Permission.MANAGE_WEBHOOKS
+    | Permission.MANAGE_EMOJIS
+
+Permission.ALL_TEXT = Permission.CREATE_INSTANT_INVITE
+    | Permission.MANAGE_CHANNELS
+    | Permission.ADD_REACTIONS
+    | Permission.VIEW_CHANNEL
+    | Permission.SEND_MESSAGES
+    | Permission.SEND_TTS_MESSAGES
+    | Permission.MANAGE_MESSAGES
+    | Permission.EMBED_LINKS
+    | Permission.ATTACH_FILES
+    | Permission.READ_MESSAGE_HISTORY
+    | Permission.MENTION_EVERYONE
+    | Permission.USE_EXTERNAL_EMOJIS
+    | Permission.MANAGE_ROLES
+    | Permission.MANAGE_WEBHOOKS
+    | Permission.USE_SLASH_COMMANDS
+
+Permission.ALL_VOICE = Permission.CREATE_INSTANT_INVITE
+    | Permission.MANAGE_CHANNELS
+    | Permission.PRIORITY_SPEAKER
+    | Permission.STREAM
+    | Permission.VIEW_CHANNEL
+    | Permission.CONNECT
+    | Permission.SPEAK
+    | Permission.MUTE_MEMBERS
+    | Permission.DEAFEN_MEMBERS
+    | Permission.MOVE_MEMBERS
+    | Permission.USE_VAD
+    | Permission.MANAGE_ROLES
+    | Permission.REQUEST_TO_SPEAK
+
+Permission.ALL = Permission.ALL_GUILD | Permission.ALL_TEXT | Permission.ALL_VOICE;
+
 /*
     Interfaces
 */
+
+export interface IPermission {
+    CREATE_INSTANT_INVITE?: bigint;
+    KICK_MEMBERS?: bigint;
+    BAN_MEMBERS?: bigint;
+    ADMINISTRATOR?: bigint;
+    MANAGE_CHANNELS?: bigint;
+    MANAGE_GUILD?: bigint;
+    ADD_REACTIONS?: bigint;
+    VIEW_AUDIT_LOG?: bigint;
+    PRIORITY_SPEAKER?: bigint;
+    STREAM?: bigint;
+    VIEW_CHANNEL?: bigint;
+    SEND_MESSAGES?: bigint;
+    SEND_TTS_MESSAGES?: bigint;
+    MANAGE_MESSAGES?: bigint;
+    EMBED_LINKS?: bigint;
+    ATTACH_FILES?: bigint;
+    READ_MESSAGE_HISTORY?: bigint;
+    MENTION_EVERYONE?: bigint;
+    USE_EXTERNAL_EMOJIS?: bigint;
+    VIEW_GUILD_INSIGHTS?: bigint;
+    CONNECT?: bigint;
+    SPEAK?: bigint;
+    MUTE_MEMBERS?: bigint;
+    DEAFEN_MEMBERS?: bigint;
+    MOVE_MEMBERS?: bigint;
+    USE_VAD?: bigint;
+    CHANGE_NICKNAME?: bigint;
+    MANAGE_NICKNAMES?: bigint;
+    MANAGE_ROLES?: bigint;
+    MANAGE_WEBHOOKS?: bigint;
+    MANAGE_EMOJIS?: bigint;
+    USE_SLASH_COMMANDS?: bigint;
+    REQUEST_TO_SPEAK?: bigint;
+    MANAGE_THREADS?: bigint;
+    USE_PUBLIC_THREADS?: bigint;
+    USE_PRIVATE_THREADS?: bigint;
+
+    ALL_GUILD?: bigint;
+    ALL_TEXT?: bigint;
+    ALL_VOICE?: bigint;
+    ALL?: bigint;
+}
 
 export interface MessageReference {
     channelID: Snowflake,
@@ -216,7 +344,7 @@ export interface CreateRoleOptions {
     color?: number,
     hoist?: boolean,
     mentionable?: boolean,
-    permissions?: number,
+    permissions?: string,
     reason?: string
 }
 
@@ -232,7 +360,8 @@ export interface EditGuildMemberOptions {
     mute?: boolean,
     deafen?: boolean,
     channelID?: Snowflake,
-    reason?: string
+    reason?: string,
+    avatar?: string;
 }
 
 export interface EditBotUserOptions {

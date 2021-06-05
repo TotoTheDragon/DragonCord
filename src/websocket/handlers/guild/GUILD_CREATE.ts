@@ -1,5 +1,5 @@
-import { Client } from "../../client/Client";
-import { Guild } from "../../structure/guild/Guild";
+import { Client } from "../../../client/Client";
+import { Guild } from "../../../structure/guild/Guild";
 
 export function guildCreate(client: Client, data: any) {
     const guild: Guild = client.guilds.add(data)

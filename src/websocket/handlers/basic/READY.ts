@@ -1,5 +1,5 @@
-import { Client } from "../../client/Client";
-import { ClientUser } from "../../client/ClientUser";
+import { Client } from "../../../client/Client";
+import { ClientUser } from "../../../client/ClientUser";
 
 export function ready(client: Client, data: any) {
     if (data.guilds)

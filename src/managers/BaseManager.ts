@@ -44,6 +44,22 @@ export abstract class BaseManager<T extends Base> {
         return value;
     }
 
+    remove(data: any, ...extras: any): T {
+        if (data === undefined || data === null) return null;
+        const existing = this._cache.get(data.id) as T;
+        if (existing && existing._update) {
+            existing._update(data);
+            this.onUpdate(existing);
+        }
+        if (existing) {
+            this._cache.remove(data.id);
+            return existing;
+        }
+        const value = new this._holds(this._client, data, ...extras);
+        this._cache.remove(data.id);
+        return value;
+    }
+
     clearCache() {
         this._cache.clear();
     }

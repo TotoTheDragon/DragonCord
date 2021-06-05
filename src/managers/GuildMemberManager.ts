@@ -18,17 +18,16 @@ export class GuildMemberManager extends BaseManager<GuildMember> implements Part
         return this._cache;
     }
 
-    get(id: string, opts?: PartialCreateOptions): Partial {
+    get(id: string, opts?: PartialCreateOptions): GuildMember {
         return this._cache.get(id) as GuildMember || this.createPartial(id, opts);
     }
 
-    createPartial(id: string, opts?: PartialCreateOptions, data?: any): Partial {
-        return this._client.channels.createPartial(id, opts, data);
+    createPartial(id: string, opts?: PartialCreateOptions, data?: any): GuildMember {
+        return this.add({ user: { id } })
     }
 
     add(data: any, cache: boolean = true, ...extras: any[]): GuildMember {
-        console.log("adding", data.user.id)
-        return super.add({ ...data, guild_id: this.guild.id }, cache, ...extras);
+        return super.add({ ...data }, cache, this.guild, ...extras);
     }
 
     async fetch(): Promise<GuildMember[]> {

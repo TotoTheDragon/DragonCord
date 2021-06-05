@@ -1,6 +1,7 @@
 import { Client } from "../../client/Client";
 import { GuildChannelManager } from "../../managers/GuildChannelManager";
 import { GuildMemberManager } from "../../managers/GuildMemberManager";
+import { GuildRoleManager } from "../../managers/GuildRoleManager";
 import { Snowflake } from "../../util/Constants";
 import { SnowflakeUtil } from "../../util/SnowflakeUtil";
 import { Base } from "../Base";
@@ -10,6 +11,7 @@ export class Guild extends Base implements Partial {
 
     channels: GuildChannelManager;
     members: GuildMemberManager;
+    roles: GuildRoleManager;
 
     id: Snowflake;
 
@@ -52,11 +54,14 @@ export class Guild extends Base implements Partial {
 
     shardID: number;
 
+    _roles: any[];
+
     constructor(client: Client, data: any) {
         super(client);
 
         this.channels = new GuildChannelManager(this, client);
         this.members = new GuildMemberManager(this, client);
+        this.roles = new GuildRoleManager(this, client)
         this.deleted = false;
 
         if (!data) return;
@@ -114,31 +119,54 @@ export class Guild extends Base implements Partial {
 
     _deserialize(data: any) {
 
+        this._roles = data.roles;
+
         this.id = data.id;
         this.available = !data.unavailable;
 
-        this.name = data.name;
-        this.icon = data.icon;
-        this.splash = data.splash;
-        this.discoverySplash = data.discoverySplash;
-        this.region = data.region;
-        this.description = data.description;
+        this.joinedTimestamp = data.joined_at ? new Date(data.joined_at).getTime() : this.joinedTimestamp;
 
-        this.vanityURLCode = data.vanity_url_code;
+        this._update(data);
+
+        return this;
+    }
+
+    _update(data: any) {
+
+        if ('name' in data)
+            this.name = data.name;
+        if ('icon' in data)
+            this.icon = data.icon;
+        if ('splash' in data)
+            this.splash = data.splash;
+        if ('discoverySplash' in data)
+            this.discoverySplash = data.discoverySplash;
+        if ('region' in data)
+            this.region = data.region;
+        if ('description' in data)
+            this.description = data.description;
+
+        if ('vanity_url_code' in data)
+            this.vanityURLCode = data.vanity_url_code;
         this.vanityURLUses = null;
 
-        this.memberCount = data.member_count || this.memberCount;
+        if ('member_count' in data)
+            this.memberCount = data.member_count ?? 0;
+
         this.large = Boolean('large' in data ? data.large : this.large);
 
-        this.features = data.features;
+        if ('features' in data)
+            this.features = data.features;
 
-        this.premiumTier = data.premium_tier;
+        if ('premium_tier' in data)
+            this.premiumTier = data.premium_tier;
 
-        this.afkTimeout = data.afk_timeout;
-        this.afkChannelID = data.afk_channel_id;
-        this.systemChannelID = data.system_channel_id;
-
-        this.joinedTimestamp = data.joined_at ? new Date(data.joined_at).getTime() : this.joinedTimestamp;
+        if ("afk_timeout" in data)
+            this.afkTimeout = data.afk_timeout;
+        if ('afk_channel_id' in data)
+            this.afkChannelID = data.afk_channel_id;
+        if ('system_channel_id' in data)
+            this.systemChannelID = data.system_channel_id;
 
         if (typeof data.premium_subscription_count !== "undefined")
             this.premiumSubscriptionCount = data.premium_subscription_count;
@@ -156,7 +184,10 @@ export class Guild extends Base implements Partial {
         if (data.owner_id)
             this.ownerID = data.owner_id;
 
-        return this;
+        if ('roles' in data)
+            this._roles = data.roles;
+
+        this._roles.forEach(data => this.roles.add(data, undefined, this));
     }
 
     serialize(props: string[] = []): object {

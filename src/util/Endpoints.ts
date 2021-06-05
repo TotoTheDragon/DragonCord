@@ -4,6 +4,7 @@ export class Endpoints {
         REST Endpoints
     */
 
+    /* Channels */
     static CHANNEL = (channel: string): string => `/channels/${channel}`;
     static CHANNEL_BULK_DELETE = (channel: string): string => `/channels/${channel}/messages/bulk-delete`;
     static CHANNEL_CALL_RING = (channel: string): string => `/channels/${channel}/call/ring`;
@@ -24,8 +25,8 @@ export class Endpoints {
     static CHANNEL_TYPING = (channel: string): string => `/channels/${channel}/typing`;
     static CHANNEL_WEBHOOKS = (channel: string): string => `/channels/${channel}/webhooks`;
     static CHANNELS = (): string => "/channels";
-    static GATEWAY = (): string => "/gateway";
-    static GATEWAY_BOT = (): string => "/gateway/bot";
+
+    /* Guildss */
     static GUILD = (guild: string): string => `/guilds/${guild}`;
     static GUILD_AUDIT_LOGS = (guild: string): string => `/guilds/${guild}/audit-logs`;
     static GUILD_BAN = (guild: string, member: string): string => `/guilds/${guild}/bans/${member}`;
@@ -53,8 +54,8 @@ export class Endpoints {
     static GUILD_WEBHOOKS = (guild: string): string => `/guilds/${guild}/webhooks`;
     static GUILD_WIDGET = (guild: string): string => `/guilds/${guild}/widget`;
     static GUILDS = () => "/guilds";
-    static INVITE = (invite: string): string => `/invite/${invite}`;
-    static OAUTH2_APPLICATION = (application: string): string => `/oauth2/applications/${application}`;
+
+    /* Users*/
     static USER = (user: string): string => `/users/${user}`;
     static USER_CHANNELS = (user: string): string => `/users/${user}/channels`;
     static USER_CONNECTIONS = (user: string): string => `/users/${user}/connections`;
@@ -63,15 +64,35 @@ export class Endpoints {
     static USER_PROFILE = (user: string): string => `/users/${user}/profile`;
     static USER_SETTINGS = (user: string): string => `/users/${user}/settings`;
     static USERS = (): string => "/users";
-    static VOICE_REGIONS = (): string => "/voice/regions";
+
+    /* Webhooks */
     static WEBHOOK = (hook: string): string => `/webhooks/${hook}`;
     static WEBHOOK_SLACK = (hook: string): string => `/webhooks/${hook}/slack`;
     static WEBHOOK_TOKEN = (hook: string, hook_token: string): string => `/webhooks/${hook}/${hook_token}`;
     static WEBHOOK_TOKEN_SLACK = (hook: string, hook_token: string): string => `/webhooks/${hook}/${hook_token}/slack`;
 
-    static INTERACTION_CALLBACK = (interaction: string, token: string) => `/interactions/${interaction}/${token}/callback`;
-    static INTERACTION_ORIGINAL = (application: string, token: string) => `/webhooks/${application}/${token}/messages/@original`;
-    static INTERACTION = (application: string, token: string) => `/webhooks/${application}/${token}`;
+    /* Interactions */
+    static INTERACTION = (applicationID: string, token: string) => `/webhooks/${applicationID}/${token}`;
+    static INTERACTION_CALLBACK = (interactionID: string, token: string) => `/interactions/${interactionID}/${token}/callback`;
+    static INTERACTION_ORIGINAL = (applicationID: string, token: string) => `/webhooks/${applicationID}/${token}/messages/@original`;
+    static INTERACTION_MESSAGES = (applicationID: string, token: string, messageID: string) => `/webhooks/${applicationID}/${token}/messages/${messageID}`;
+
+    static APPLICATION_COMMANDS = (applicationID: string) => `/applications/${applicationID}/commands`;
+    static APPLICATION_COMMAND = (applicationID: string, commandID: string) => `/applications/${applicationID}/commands/${commandID}`;
+    static APPLICATION_COMMAND_PERMISSIONS = (applicationID: string, commandID: string) => `/applications/${applicationID}/commands/${commandID}/permissions`;
+    static GUILD_COMMANDS = (applicationID: string, guildID: string) => `/applications/${applicationID}/guilds/${guildID}/commands`;
+    static GUILD_COMMANDS_PERMISSIONS = (applicationID: string, guildID: string) => `/applications/${applicationID}/guilds/${guildID}/commands/permissions`;
+    static GUILD_COMMAND = (applicationID: string, guildID: string, commandID: string) => `/applications/${applicationID}/guilds/${guildID}/commands/${commandID}`;
+    static GUILD_COMMAND_PERMISSIONS = (applicationID: string, guildID: string, commandID: string) => `/applications/${applicationID}/guilds/${guildID}/commands/${commandID}/permissions`;
+
+
+    /* Other */
+    static GATEWAY = (): string => "/gateway";
+    static GATEWAY_BOT = (): string => "/gateway/bot";
+    static VOICE_REGIONS = (): string => "/voice/regions";
+    static INVITE = (invite: string): string => `/invite/${invite}`;
+    static OAUTH2_APPLICATION = (application: string): string => `/oauth2/applications/${application}`;
+
     /*
         Client Endpoints
     */

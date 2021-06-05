@@ -8,6 +8,7 @@ import { Method, REST_VERSION, Urls } from "../util/Constants";
 import { DCFile } from "../util/DCFile";
 import { Util } from "../util/Util";
 import { MultipartData } from "../util/MultipartData";
+import { inspect } from "util";
 
 export class RequestHandler extends Base {
 
@@ -143,8 +144,8 @@ export class RequestHandler extends Base {
                                     reject(err);
                                     return;
                                 }
-
-                            if (response.code) reject(new AsyncError(resp.statusMessage, "DiscordRESTError", stack));
+                            if (response.code) console.log(response)
+                            if (response.code) reject(new AsyncError(resp.statusMessage, "DiscordRESTError", stack + response.errors ? ("\n" + inspect(response.errors, false, 30)) : ""));
                             else reject(new AsyncError(resp.statusMessage, "DiscordHTTPError", stack));
 
                             return;

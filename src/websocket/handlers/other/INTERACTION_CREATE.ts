@@ -1,5 +1,5 @@
-import { Client } from "../../client/Client";
-import { Interaction } from "../../structure/interaction/Interaction";
+import { Client } from "../../../client/Client";
+import { Interaction } from "../../../structure/interaction/Interaction";
 
 export async function interactionCreate(client: Client, data: any) {
     const interaction = new Interaction(client, data);

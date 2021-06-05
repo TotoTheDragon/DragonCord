@@ -165,6 +165,9 @@ export class Message extends Base implements Partial {
         if ('components' in data)
             this.components = new ComponentHolder(this._client, data.components);
 
+        if ('deleted' in data)
+            this.deleted = data.deleted;
+
         return clone;
     }
 
@@ -175,6 +178,7 @@ export class Message extends Base implements Partial {
             "guildID",
             "author",
             "components",
+            "deleted",
             ...props
         ])
     }

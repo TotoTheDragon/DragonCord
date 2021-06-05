@@ -3,6 +3,8 @@ import { Snowflake } from "../../util/Constants";
 import { DCFile } from "../../util/DCFile";
 import { Endpoints } from "../../util/Endpoints";
 import { Base } from "../Base";
+import { Guild } from "../guild/Guild";
+import { GuildMember } from "../guild/GuildMember";
 import { TextBasedChannel } from "../interfaces/TextBasedChannel";
 import { Message } from "../Message";
 import { MessageEmbed } from "../MessageEmbed";
@@ -22,7 +24,7 @@ export class Interaction extends Base {
     version: number;
     type: number; // Make ENUM
     token: string;
-    member: Base;
+    member: GuildMember;
     user: User;
     data: ApplicationCommandInteractionData;
 
@@ -45,13 +47,16 @@ export class Interaction extends Base {
 
         this.token = data.token;
 
-        // TODO Implement members
-        this.member = data.member;
+        this.member = this.guild?.members.add(data.member);
 
         if ('user' in data)
             this.user = client.users.add(data.user);
         else
             this.user = client.users.add(data.member.user);
+    }
+
+    get guild(): Guild {
+        return this.guildID ? this._client.guilds.resolve(this.guildID) || this._client.guilds.add({ id: this.guildID }) : null;
     }
 
     get deferType(): number {
